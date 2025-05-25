@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-card p-5">
+                <div class="text-center mb-4">
+                    <h1 class="h3 fw-bold text-danger">
+                        <i class="bi bi-shield-lock me-2"></i>Admin Access
+                    </h1>
+                    <p class="text-muted">Restricted area - authorized personnel only</p>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Admin Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent">
+                                <i class="bi bi-key"></i>
+                            </span>
+                            <input type="password" 
+                                   class="form-control bg-transparent" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   placeholder="Enter admin password">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-danger w-100 py-2 mb-3">
+                        <i class="bi bi-unlock me-2"></i>Access Admin Panel
+                    </button>
+                </form>
+                
+                <div class="text-center">
+                    <a href="{{ url_for('index') }}" class="text-muted text-decoration-none">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Homepage
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Security Notice:</strong><br>
+                        This area is for authorized administrators only. 
+                        All access attempts are logged and monitored.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

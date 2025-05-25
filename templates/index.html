@@ -1,0 +1,1987 @@
+{% extends "base.html" %}
+
+{% block title %}Aeye - Discover the Perfect AI Tool{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">    <!-- Neural Network Background -->
+    <div class="hero-background">
+        <div class="neural-network-container">
+            <!-- Central Core -->
+            <div class="central-core">
+                <div class="core-inner"></div>
+                <div class="core-pulse"></div>
+            </div>
+            
+            <!-- Network Nodes -->
+            <div class="network-nodes" id="networkNodes"></div>
+            
+            <!-- Network Connections -->
+            <svg class="network-connections" id="networkSvg">
+                <!-- Connections will be dynamically generated -->
+            </svg>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <div class="hero-badge mb-4">
+                        <span class="badge-text">🚀 The Ultimate AI Discovery Platform</span>
+                    </div>                    <h1 class="hero-title mb-4">
+                        Discover <span class="typing-text font-accent" id="typingText"></span>
+                        <br>AI Tools That <span class="highlight-text font-accent">Transform</span> Your Work
+                    </h1>
+                    
+                    <p class="hero-subtitle mb-5">
+                        Stop drowning in endless AI tool lists. Our community has tested thousands of tools 
+                        so you don't have to. Find game-changing AI solutions in seconds, not hours.
+                    </p>
+                </div>
+                  <!-- Enhanced Search Bar -->
+                <div class="hero-search-container mb-5">
+                    <form action="{{ url_for('explore') }}" method="GET" class="search-form">
+                        <div class="search-input-wrapper">
+                            <div class="search-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <input type="text" 
+                                   class="hero-search-input" 
+                                   placeholder="What kind of AI tool are you looking for?"
+                                   name="search"
+                                   id="heroSearchInput"
+                                   autocomplete="off">
+                            <button class="hero-search-btn" type="submit">
+                                <span>Find Tools</span>
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="heroSearchSuggestions" class="hero-search-suggestions"></div>
+                </div>
+                
+                <!-- Popular Categories -->
+                <div class="popular-categories">
+                    <p class="categories-label">Popular categories:</p>
+                    <div class="categories-grid">
+                        <a href="{{ url_for('explore', tags='productivity') }}" class="category-pill">
+                            <i class="bi bi-briefcase"></i>
+                            <span>Productivity</span>
+                        </a>
+                        <a href="{{ url_for('explore', tags='design') }}" class="category-pill">
+                            <i class="bi bi-palette"></i>
+                            <span>Design</span>
+                        </a>
+                        <a href="{{ url_for('explore', tags='writing') }}" class="category-pill">
+                            <i class="bi bi-pencil"></i>
+                            <span>Writing</span>
+                        </a>
+                        <a href="{{ url_for('explore', tags='coding') }}" class="category-pill">
+                            <i class="bi bi-code"></i>
+                            <span>Development</span>
+                        </a>
+                        <a href="{{ url_for('explore', tags='marketing') }}" class="category-pill">
+                            <i class="bi bi-megaphone"></i>
+                            <span>Marketing</span>
+                        </a>
+                        <a href="{{ url_for('explore', tags='analytics') }}" class="category-pill">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Promoted Tools Section - Temporarily Hidden for Launch -->
+{% if false %}
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold gradient-text mb-3">
+                    <i class="bi bi-megaphone me-2"></i>Promoted Tools
+                </h2>
+                <p class="text-muted">Featured by our community partners</p>
+            </div>
+        </div>        <div class="row g-4">
+            {% if promoted_tools %}
+            {% for tool in promoted_tools %}
+            <div class="col-lg-4">
+                <div class="card tool-card glass-card h-100 border-0 position-relative">
+                    <div class="promoted-badge">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Promoted</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if tool.logo_url %}
+                            <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" class="tool-logo-sm me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="tool-logo-placeholder tool-logo-sm me-3">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1 text-light">{{ tool.name }}</h5>
+                                <span class="pricing-badge pricing-{{ 'freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model.lower() }}">
+                                    {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-muted mb-3">
+                            {{ tool.description[:100] }}{% if tool.description|length > 100 %}...{% endif %}
+                        </p>                        <div class="tool-meta mb-3">
+                            <div class="rating-display">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if tool.avg_rating >= i %}-fill{% endif %} rating-star"></i>
+                                {% endfor %}
+                                <span class="rating-text">
+                                    {% if tool.avg_rating > 0 %}
+                                        {{ "%.1f"|format(tool.avg_rating) }} ({{ tool.review_count }} review{% if tool.review_count != 1 %}s{% endif %})
+                                    {% else %}
+                                        No reviews yet
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span class="views-count">{{ tool.click_count }} views</span>
+                        </div>
+                        
+                        {% if tool.tags %}
+                        <div class="tool-tags mb-3">
+                            {% for tag in (tool.tags|from_json)[:3] %}
+                            <span class="tool-tag-small">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('tool_detail', tool_id=tool.id, campaign_id=tool.campaign_id) }}" class="btn btn-primary w-100">
+                            <span>Explore Tool</span>
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No promoted tools available at the moment.
+                </div>
+            </div>            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Tools Section -->
+{% if featured_tools %}
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold gradient-text mb-3">
+                    <i class="bi bi-star-fill me-2"></i>Featured Tools
+                </h2>
+                <p class="text-muted">Handpicked AI tools that are making waves</p>
+            </div>
+        </div>          <div class="row g-4">
+            {% for tool in featured_tools %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card tool-card glass-card h-100 border-0 position-relative">
+                    <div class="featured-badge">
+                        <i class="bi bi-star-fill"></i>
+                        <span>Featured</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if tool.logo_url %}
+                            <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" class="tool-logo-sm me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="tool-logo-placeholder tool-logo-sm me-3">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1 text-light">{{ tool.name }}</h5>
+                                <span class="pricing-badge pricing-{{ 'freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model.lower() }}">
+                                    {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                </span>
+                            </div>
+                        </div>
+                          <p class="card-text text-muted mb-3">
+                            {{ tool.description[:100] }}{% if tool.description|length > 100 %}...{% endif %}
+                        </p>
+                        
+                        <div class="tool-meta mb-3">
+                            <div class="rating-display">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if tool.avg_rating >= i %}-fill{% endif %} rating-star"></i>
+                                {% endfor %}
+                                <span class="rating-text">
+                                    {% if tool.avg_rating > 0 %}
+                                        {{ "%.1f"|format(tool.avg_rating) }} ({{ tool.review_count }} review{% if tool.review_count != 1 %}s{% endif %})
+                                    {% else %}
+                                        No reviews yet
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span class="views-count">{{ tool.click_count }} views</span>
+                        </div>
+                        
+                        {% if tool.tags %}
+                        <div class="tool-tags mb-3">
+                            {% for tag in (tool.tags|from_json)[:3] %}
+                            <span class="tool-tag-small">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('tool_detail', tool_id=tool.id) }}" class="btn btn-primary w-100">
+                            <span>Explore Tool</span>
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Popular Tools Section -->
+{% if popular_tools %}
+<section class="py-5 bg-dark bg-opacity-25">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold gradient-text mb-3">
+                    <i class="bi bi-trending-up me-2"></i>Trending Now
+                </h2>
+                <p class="text-muted">Most popular AI tools in the community</p>
+            </div>
+        </div>        <div class="row g-4">
+            {% for tool in popular_tools %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card tool-card glass-card h-100 border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if tool.logo_url %}
+                            <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" class="tool-logo-sm me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <div class="tool-logo-placeholder tool-logo-sm me-3">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1 text-light">{{ tool.name }}</h5>
+                                <span class="pricing-badge pricing-{{ 'freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model.lower() }}">
+                                    {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-muted mb-3">
+                            {{ tool.description[:100] }}{% if tool.description|length > 100 %}...{% endif %}
+                        </p>
+                          <div class="tool-meta mb-3">
+                            <div class="rating-display">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if tool.avg_rating >= i %}-fill{% endif %} rating-star"></i>
+                                {% endfor %}
+                                <span class="rating-text">
+                                    {% if tool.avg_rating > 0 %}
+                                        {{ "%.1f"|format(tool.avg_rating) }} ({{ tool.review_count }} review{% if tool.review_count != 1 %}s{% endif %})
+                                    {% else %}
+                                        No reviews yet
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span class="views-count">{{ tool.click_count }} views</span>
+                        </div>
+                        
+                        {% if tool.tags %}
+                        <div class="tool-tags mb-3">
+                            {% for tag in (tool.tags|from_json)[:3] %}
+                            <span class="tool-tag-small">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('tool_detail', tool_id=tool.id) }}" class="btn btn-primary w-100">
+                            <span>Explore Tool</span>
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('explore') }}" class="btn btn-gradient btn-lg px-5">
+                <i class="bi bi-grid-3x3-gap me-2"></i>Explore All Tools
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- User Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold gradient-text mb-3">
+                    <i class="bi bi-chat-heart me-2"></i>What Our Users Say
+                </h2>
+                <p class="text-muted">Real feedback from our community</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="testimonial-card glass-card p-4 h-100">
+                    <div class="d-flex mb-3">
+                        {% for i in range(5) %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="mb-3">"Aeye helped me find the perfect AI writing assistant for my blog. The reviews are genuine and detailed!"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar bg-gradient rounded-circle me-3 d-flex align-items-center justify-content-center">S</div>
+                        <div>
+                            <strong>Sarah Johnson</strong>
+                            <small class="d-block text-muted">Content Creator</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="testimonial-card glass-card p-4 h-100">
+                    <div class="d-flex mb-3">
+                        {% for i in range(5) %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="mb-3">"As a developer, I've discovered amazing coding AI tools here that I never knew existed. Great platform!"</p>
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar bg-gradient rounded-circle me-3 d-flex align-items-center justify-content-center">M</div>
+                        <div>
+                            <strong>Mike Chen</strong>
+                            <small class="d-block text-muted">Software Developer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="testimonial-card glass-card p-4 h-100">
+                    <div class="d-flex mb-3">
+                        {% for i in range(5) %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="mb-3">"The comparison features are fantastic. I can easily see which AI tool fits my budget and needs."</p>
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar bg-gradient rounded-circle me-3 d-flex align-items-center justify-content-center">E</div>
+                        <div>
+                            <strong>Emily Rodriguez</strong>
+                            <small class="d-block text-muted">Marketing Manager</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Aeye Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold gradient-text mb-3">
+                    <i class="bi bi-lightning me-2"></i>Why Choose Aeye?
+                </h2>
+                <p class="text-muted">The ultimate platform for AI tool discovery</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card glass-card p-4 text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Verified Reviews</h5>
+                    <p class="text-muted">All reviews are from real users who have tested the tools</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card glass-card p-4 text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">AI-Powered Search</h5>
+                    <p class="text-muted">Smart search that understands your needs and suggests perfect matches</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card glass-card p-4 text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Compare Tools</h5>
+                    <p class="text-muted">Side-by-side comparisons of features, pricing, and user ratings</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card glass-card p-4 text-center h-100">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Community Driven</h5>
+                    <p class="text-muted">Join a community of AI enthusiasts sharing insights and experiences</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="newsletter-card glass-card p-5 text-center">
+                    <h3 class="fw-bold gradient-text mb-3">
+                        <i class="bi bi-envelope-heart me-2"></i>Stay Updated
+                    </h3>
+                    <p class="text-muted mb-4">Get weekly updates on new AI tools, reviews, and industry insights</p>
+                    <form class="row g-2 justify-content-center">
+                        <div class="col-md-6">
+                            <input type="email" class="form-control bg-transparent" placeholder="Enter your email" required>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-gradient w-100">Subscribe</button>
+                        </div>
+                    </form>
+                    <small class="text-muted mt-2 d-block">Join 10,000+ subscribers. No spam, unsubscribe anytime.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-gradient text-white">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="display-5 fw-bold mb-4">Ready to discover your next AI tool?</h2>
+                <p class="lead mb-4">Join thousands of users who trust Aeye to find the perfect AI solutions for their needs.</p>
+                <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-person-plus me-2"></i>Get Started Free
+                    </a>
+                    <a href="{{ url_for('register') }}?advertiser=1" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-megaphone me-2"></i>List Your Tool
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-brand mb-4">
+                    <h3 class="navbar-brand mb-3">Aeye</h3>
+                    <p class="text-muted">The ultimate platform for discovering, comparing, and reviewing AI tools. Find the perfect AI solution for your needs.</p>
+                </div>
+                <!-- <div class="social-links">
+                    <a href="#" class="social-link me-3"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="social-link me-3"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-link me-3"><i class="bi bi-github"></i></a>
+                    <a href="#" class="social-link"><i class="bi bi-discord"></i></a>
+                </div> -->
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title mb-3">Platform</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('explore') }}">Explore Tools</a></li>
+                    <li><a href="{{ url_for('categories') }}">Categories</a></li>
+                    <li><a href="#reviews">Reviews</a></li>
+                    <li><a href="#trending">Trending</a></li>
+                    <li><a href="#featured">Featured</a></li>
+                </ul>
+            </div>
+            
+            <!-- <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title mb-3">For Developers</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('register') }}?advertiser=1">List Your Tool</a></li>
+                    <li><a href="#api">API Access</a></li>
+                    <li><a href="#integrations">Integrations</a></li>
+                    <li><a href="#documentation">Documentation</a></li>
+                    <li><a href="#developer-portal">Developer Portal</a></li>
+                </ul>
+            </div> -->
+              <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title mb-3">Support</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('help_center') }}">Help Center</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="#status">System Status</a></li>
+                    <li><a href="#feedback">Feedback</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-title mb-3">Legal</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('about_us') }}">About Us</a></li>
+                    <li><a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ url_for('terms_of_service') }}">Terms of Service</a></li>
+                    <li><a href="{{ url_for('cookie_policy') }}">Cookie Policy</a></li>
+                    <li><a href="{{ url_for('community_guidelines') }}">Community Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="footer-divider my-4">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6">                <p class="footer-copyright mb-0">
+                    © 2025 Aeye. All rights reserved. 
+                    <br>
+                    Made with ❤️ for the AI community by An Indian 
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="footer-badges">
+                    <span class="badge bg-success me-2">
+                        <i class="bi bi-shield-check me-1"></i>Secure
+                    </span>
+                    <span class="badge bg-primary me-2">
+                        <i class="bi bi-award me-1"></i>Trusted
+                    </span>
+                    <span class="badge bg-info">
+                        <i class="bi bi-people me-1"></i>Community Driven
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hero Section - Modern Blue Gradient */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+}
+
+/* Hero Background */
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.7;
+}
+
+/* Neural Network Container */
+.neural-network-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* Central Core - Blue Theme */
+.central-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    z-index: 10;
+}
+
+.core-inner {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0066FF 0%, #3B82F6 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 40px rgba(6, 102, 255, 0.9),
+        0 0 80px rgba(59, 130, 246, 0.6),
+        inset 0 0 25px rgba(255, 255, 255, 0.3);
+    animation: coreGlow 3s ease-in-out infinite alternate;
+}
+
+.core-pulse {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(96, 165, 250, 0.5);
+    border-radius: 50%;
+    animation: corePulse 2s ease-in-out infinite;
+}
+
+/* Network Nodes */
+.network-nodes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.network-node {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.6);
+    animation: nodeFlicker 4s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+.network-node.active {
+    animation: nodeActivate 0.5s ease-out;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.9);
+}
+
+/* Network Connections SVG */
+.network-connections {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.connection-line {
+    stroke: rgba(102, 126, 234, 0.3);
+    stroke-width: 0.5;
+    fill: none;
+    opacity: 0;
+    animation: connectionAppear 0.8s ease-out forwards;
+}
+
+.connection-line.pulse {
+    animation: connectionPulse 2s ease-in-out;
+}
+
+/* Data Flow Particles */
+.data-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(102, 126, 234, 0.8);
+    opacity: 0;
+}
+
+/* Animations */
+@keyframes coreGlow {
+    0% { 
+        box-shadow: 
+            0 0 30px rgba(102, 126, 234, 0.8),
+            0 0 60px rgba(102, 126, 234, 0.6),
+            inset 0 0 20px rgba(255, 255, 255, 0.3);
+        transform: scale(1);
+    }
+    100% { 
+        box-shadow: 
+            0 0 40px rgba(102, 126, 234, 1),
+            0 0 80px rgba(102, 126, 234, 0.8),
+            inset 0 0 25px rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
+    }
+}
+
+@keyframes corePulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.2;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes nodeFlicker {
+    0%, 100% { 
+        opacity: 0.4; 
+        transform: scale(1);
+    }
+    25% { 
+        opacity: 0.8; 
+        transform: scale(1.2);
+    }
+    50% { 
+        opacity: 0.6; 
+        transform: scale(1);
+    }
+    75% { 
+        opacity: 0.9; 
+        transform: scale(1.1);
+    }
+}
+
+@keyframes nodeActivate {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.6);
+    }
+    50% {
+        transform: scale(2);
+        box-shadow: 0 0 20px rgba(102, 126, 234, 1);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(102, 126, 234, 0.9);
+    }
+}
+
+@keyframes connectionAppear {
+    0% {
+        opacity: 0;
+        stroke-dasharray: 0 100;
+    }
+    100% {
+        opacity: 1;
+        stroke-dasharray: 5 5;
+    }
+}
+
+@keyframes connectionPulse {
+    0% {
+        stroke: rgba(102, 126, 234, 0.3);
+        stroke-width: 0.5;
+    }
+    50% {
+        stroke: rgba(102, 126, 234, 0.8);
+        stroke-width: 1;
+    }
+    100% {
+        stroke: rgba(102, 126, 234, 0.3);
+        stroke-width: 0.5;
+    }
+}
+
+@keyframes dataFlow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    10% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    90% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0);
+    }
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    z-index: 2;
+    position: relative;
+    font-family: var(--font-primary);
+    color: #FFFFFF;
+}
+
+.highlight-text {
+    background: linear-gradient(135deg, #0066FF 0%, #60A5FA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    font-weight: 700;
+}
+
+.highlight-text::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(135deg, #0066FF 0%, #60A5FA 100%);
+    border-radius: 2px;
+    animation: highlightGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes highlightGlow {
+    0% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.8); }
+}
+
+.typing-text {
+    color: #60A5FA;
+    font-weight: 700;
+}
+
+.hero-badge {
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+.badge-text {
+    background: rgba(6, 102, 255, 0.15);
+    color: #60A5FA;
+    padding: 0.6rem 1.8rem;
+    border-radius: 50px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    font-weight: 600;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced Search Bar - Blue Theme */
+.hero-search-container {
+    position: relative;
+    z-index: 2;
+}
+
+.search-input-wrapper {
+    position: relative;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 60px;
+    padding: 10px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    box-shadow: 0 8px 32px rgba(6, 102, 255, 0.15);
+    display: flex;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    margin-left: 20px;
+    margin-right: 15px;
+}
+
+.hero-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 1.1rem;
+    padding: 15px 0;
+}
+
+.hero-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-search-btn {
+    background: linear-gradient(135deg, #0066FF 0%, #3B82F6 100%);
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-primary);
+}
+
+.hero-search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(6, 102, 255, 0.4);
+    color: white;
+    background: linear-gradient(135deg, #0052CC 0%, #2563EB 100%);
+}
+
+.hero-search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    margin-top: 10px;
+}
+
+.hero-search-suggestions .search-suggestion-item {
+    padding: 12px 20px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-search-suggestions .search-suggestion-item:hover {
+    background-color: rgba(102, 126, 234, 0.3);
+}
+
+.hero-search-suggestions .search-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+/* Popular Categories */
+.popular-categories {
+    text-align: center;
+    z-index: 2;
+    position: relative;
+}
+
+.categories-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.categories-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.category-pill {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.category-pill:hover {
+    background: rgba(102, 126, 234, 0.3);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Promoted Tools Section */
+.promoted-section {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.promoted-card {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.promoted-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.promoted-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 10;
+}
+
+/* Tool Cards Enhancement */
+.tool-logo-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.tool-logo-sm {
+    width: 40px;
+    height: 40px;
+}
+
+.tool-logo-md {
+    width: 48px;
+    height: 48px;
+}
+
+.pricing-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pricing-free {
+    background: #10B981;
+    color: white;
+}
+
+.pricing-paid {
+    background: #F59E0B;
+    color: white;
+}
+
+.pricing-freemium {
+    background: #8B5CF6;
+    color: white;
+}
+
+.tool-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.rating-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-star {
+    color: #F59E0B;
+    font-size: 0.9rem;
+}
+
+.rating-text {
+    color: #F59E0B;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.views-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tool-tag-small {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    display: inline-block;    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+/* Promoted and Featured Badges */
+.promoted-badge,
+.featured-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.featured-badge {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+    color: #333;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.tool-card:hover .promoted-badge,
+.tool-card:hover .featured-badge {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
+}
+
+/* Footer Styles */
+.footer {
+    background: #0a0e17;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-brand h3 {
+    color: #667eea;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+}
+
+.footer-title {
+    color: white;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #667eea;
+}
+
+.social-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.footer-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.footer-copyright {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-badges .badge {
+    margin-bottom: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .categories-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .category-pill {
+        width: fit-content;
+    }
+    
+    .search-input-wrapper {
+        flex-direction: column;
+        padding: 15px;
+        border-radius: 20px;
+    }
+    
+    .hero-search-input {
+        text-align: center;
+        padding: 10px 0;
+    }
+    
+    .hero-search-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }    .promoted-badge,
+    .featured-badge {
+        top: 8px;
+        right: 8px;
+        padding: 3px 6px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Loading Animation */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Three.js Eye-inspired AI Discovery Animation
+function initThreeJSAnimation() {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas || !window.THREE) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    
+    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+    renderer.setClearColor(0x000000, 0);
+
+    // Aeye Theme Colors
+    const colors = {
+        primary: 0x667eea,     // Primary blue
+        secondary: 0x764ba2,   // Secondary purple
+        accent: 0x10A37F,      // Accent teal
+        highlight: 0xF59E0B    // Highlight amber
+    };
+    
+    // Create central eye
+    const eyeGroup = new THREE.Group();
+    scene.add(eyeGroup);
+    
+    // Outer eye ring
+    const ringGeometry = new THREE.RingGeometry(1.8, 2.0, 64);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: colors.primary,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6
+    });
+    const eyeRing = new THREE.Mesh(ringGeometry, ringMaterial);
+    eyeGroup.add(eyeRing);
+    
+    // Iris
+    const irisGeometry = new THREE.CircleGeometry(1.6, 64);
+    const irisMaterial = new THREE.MeshBasicMaterial({
+        color: colors.secondary,
+        transparent: true,
+        opacity: 0.2
+    });
+    const iris = new THREE.Mesh(irisGeometry, irisMaterial);
+    eyeGroup.add(iris);
+    
+    // Pupil
+    const pupilGeometry = new THREE.CircleGeometry(0.7, 32);
+    const pupilMaterial = new THREE.MeshBasicMaterial({
+        color: colors.primary,
+        transparent: true,
+        opacity: 0.8
+    });
+    const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+    eyeGroup.add(pupil);
+    
+    // Inner pupil glow
+    const innerPupilGeometry = new THREE.CircleGeometry(0.4, 32);
+    const innerPupilMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.9
+    });
+    const innerPupil = new THREE.Mesh(innerPupilGeometry, innerPupilMaterial);
+    innerPupil.position.z = 0.01;
+    eyeGroup.add(innerPupil);
+    
+    // Create scanlines
+    const scanLineGroup = new THREE.Group();
+    scene.add(scanLineGroup);
+    
+    for (let i = 0; i < 10; i++) {
+        const lineGeometry = new THREE.PlaneGeometry(10, 0.02);
+        const lineMaterial = new THREE.MeshBasicMaterial({
+            color: colors.primary,
+            transparent: true,
+            opacity: 0.3
+        });
+        const line = new THREE.Mesh(lineGeometry, lineMaterial);
+        line.position.y = -5 + i * 1.1;
+        line.userData = {
+            speed: 0.02 + Math.random() * 0.01,
+            originalY: line.position.y
+        };
+        scanLineGroup.add(line);
+    }
+    
+    // Create orbital data particles
+    const orbitalGroup = new THREE.Group();
+    scene.add(orbitalGroup);
+    
+    const orbitalParticles = [];
+    for (let i = 0; i < 100; i++) {
+        const particleSize = Math.random() * 0.04 + 0.01;
+        const particleGeometry = new THREE.SphereGeometry(particleSize, 8, 8);
+        
+        // Choose color based on position in orbit
+        const colorChoice = Math.random();
+        let particleColor;
+        
+        if (colorChoice < 0.4) {
+            particleColor = colors.primary;
+        } else if (colorChoice < 0.7) {
+            particleColor = colors.secondary;
+        } else if (colorChoice < 0.9) {
+            particleColor = colors.accent;
+        } else {
+            particleColor = colors.highlight;
+        }
+        
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: particleColor,
+            transparent: true,
+            opacity: Math.random() * 0.5 + 0.3
+        });
+        
+        const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+        
+        // Create orbital parameters
+        const orbitRadius = Math.random() * 4 + 2;
+        const orbitSpeed = (Math.random() * 0.001 + 0.001) * (Math.random() > 0.5 ? 1 : -1);
+        const orbitAngle = Math.random() * Math.PI * 2;
+        const orbitHeight = (Math.random() - 0.5) * 4;
+        const orbitTilt = Math.random() * Math.PI;
+        
+        particle.userData = {
+            orbitRadius,
+            orbitSpeed,
+            orbitAngle,
+            orbitHeight,
+            orbitTilt,
+            pulsePhase: Math.random() * Math.PI * 2
+        };
+        
+        orbitalParticles.push(particle);
+        orbitalGroup.add(particle);
+    }
+    
+    // Create data streams (curved lines)
+    const dataStreamGroup = new THREE.Group();
+    scene.add(dataStreamGroup);
+    
+    const curves = [];
+    for (let i = 0; i < 20; i++) {
+        // Create a curved path
+        const curve = new THREE.CubicBezierCurve3(
+            new THREE.Vector3(-8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 4),
+            new THREE.Vector3(-4, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 3),
+            new THREE.Vector3(4, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 3),
+            new THREE.Vector3(8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 4)
+        );
+        
+        const points = curve.getPoints(50);
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        
+        const colorIdx = Math.floor(Math.random() * 3);
+        const colorOptions = [colors.primary, colors.secondary, colors.accent];
+        
+        const material = new THREE.LineBasicMaterial({
+            color: colorOptions[colorIdx],
+            transparent: true,
+            opacity: Math.random() * 0.2 + 0.1
+        });
+        
+        const curveObject = new THREE.Line(geometry, material);
+        curveObject.userData = {
+            speed: Math.random() * 0.2 + 0.1,
+            time: Math.random() * Math.PI * 2
+        };
+        
+        curves.push(curveObject);
+        dataStreamGroup.add(curveObject);
+    }
+    
+    // Create floating keywords for AI tools
+    const keywords = ['AI Tools', 'Discovery', 'Chatbots', 'Image Gen', 'Automation', 'Analytics', 'ML Models'];
+    const keywordMeshes = [];
+    
+    keywords.forEach((keyword, index) => {
+        const canvas2d = document.createElement('canvas');
+        canvas2d.width = 256;
+        canvas2d.height = 64;
+        const context = canvas2d.getContext('2d');
+        context.font = 'bold 24px Space Grotesk';
+        context.fillStyle = '#FFFFFF';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(keyword, 128, 32);
+        
+        const texture = new THREE.CanvasTexture(canvas2d);
+        const material = new THREE.SpriteMaterial({ 
+            map: texture,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(2, 0.5, 1);
+        
+        // Position keywords in different areas
+        const distance = Math.random() * 5 + 5;
+        const angle = (index / keywords.length) * Math.PI * 2;
+        
+        sprite.position.set(
+            Math.cos(angle) * distance,
+            Math.sin(angle) * distance / 2,
+            (Math.random() - 0.5) * 3
+        );
+        
+        sprite.userData = {
+            originalX: sprite.position.x,
+            originalY: sprite.position.y,
+            originalZ: sprite.position.z,
+            floatPhase: Math.random() * Math.PI * 2,
+            fadeDirection: Math.random() > 0.5 ? 1 : -1,
+            fadeSpeed: Math.random() * 0.005 + 0.001
+        };
+        
+        keywordMeshes.push(sprite);
+        scene.add(sprite);
+    });
+    
+    // Position the camera
+    camera.position.set(0, 0, 10);
+    camera.lookAt(0, 0, 0);
+    
+    // Animation variables
+    let time = 0;
+    
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.01;
+        
+        // Animate eye
+        eyeGroup.rotation.z = Math.sin(time * 0.2) * 0.05;
+        pupil.scale.x = 1 + Math.sin(time) * 0.1;
+        pupil.scale.y = 1 + Math.cos(time * 1.2) * 0.1;
+        
+        // Make the eye follow mouse movement
+        const mouseX = (mousePosition.x / window.innerWidth) * 2 - 1;
+        const mouseY = -(mousePosition.y / window.innerHeight) * 2 + 1;
+        
+        pupil.position.x = mouseX * 0.2;
+        pupil.position.y = mouseY * 0.2;
+        innerPupil.position.x = mouseX * 0.2;
+        innerPupil.position.y = mouseY * 0.2;
+        
+        // Pulse the iris
+        const pulseScale = 1 + Math.sin(time * 1.5) * 0.03;
+        iris.scale.set(pulseScale, pulseScale, 1);
+        
+        // Animate the outer ring
+        const ringPulse = 1 + Math.sin(time * 0.5) * 0.05;
+        eyeRing.scale.set(ringPulse, ringPulse, 1);
+        eyeRing.material.opacity = 0.4 + Math.sin(time) * 0.1;
+        
+        // Animate scanlines
+        scanLineGroup.children.forEach(line => {
+            line.position.y += line.userData.speed;
+            
+            if (line.position.y > 5) {
+                line.position.y = -5;
+            }
+            
+            // Pulse opacity
+            line.material.opacity = 0.2 + Math.sin(time * 3 + line.userData.originalY) * 0.1;
+        });
+        
+        // Animate orbital particles
+        orbitalParticles.forEach(particle => {
+            // Update orbit position
+            particle.userData.orbitAngle += particle.userData.orbitSpeed;
+            
+            // Calculate position based on orbital parameters
+            const x = Math.cos(particle.userData.orbitAngle) * particle.userData.orbitRadius;
+            const y = Math.sin(particle.userData.orbitAngle) * particle.userData.orbitRadius * Math.sin(particle.userData.orbitTilt);
+            const z = Math.sin(particle.userData.orbitAngle) * particle.userData.orbitRadius * Math.cos(particle.userData.orbitTilt);
+            
+            particle.position.set(x, y + particle.userData.orbitHeight, z);
+            
+            // Pulse scale and opacity
+            const pulse = Math.sin(time * 3 + particle.userData.pulsePhase) * 0.5 + 1;
+            particle.scale.set(pulse, pulse, pulse);
+            particle.material.opacity = 0.3 + Math.sin(time * 2 + particle.userData.pulsePhase) * 0.2;
+        });
+        
+        // Animate data streams
+        curves.forEach(curve => {
+            curve.userData.time += curve.userData.speed * 0.01;
+            curve.material.opacity = 0.1 + Math.abs(Math.sin(curve.userData.time)) * 0.2;
+        });
+        
+        // Animate keywords
+        keywordMeshes.forEach(keyword => {
+            // Gentle floating motion
+            keyword.position.x = keyword.userData.originalX + Math.sin(time * 0.3 + keyword.userData.floatPhase) * 0.3;
+            keyword.position.y = keyword.userData.originalY + Math.cos(time * 0.2 + keyword.userData.floatPhase) * 0.2;
+            
+            // Fade in and out
+            keyword.material.opacity += keyword.userData.fadeDirection * keyword.userData.fadeSpeed;
+            
+            if (keyword.material.opacity > 0.8) {
+                keyword.userData.fadeDirection = -1;
+            } else if (keyword.material.opacity < 0.2) {
+                keyword.userData.fadeDirection = 1;
+            }
+        });
+
+        // Gentle camera movement
+        camera.position.x = Math.sin(time * 0.1) * 0.5;
+        camera.position.y = Math.cos(time * 0.15) * 0.3;
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+    }
+
+    // Track mouse position for eye movement
+    const mousePosition = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    
+    window.addEventListener('mousemove', (e) => {
+        mousePosition.x = e.clientX;
+        mousePosition.y = e.clientY;
+    });
+    
+    // Handle window resize
+    function handleResize() {
+        const width = canvas.offsetWidth;
+        const height = canvas.offsetHeight;
+        
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }
+
+    window.addEventListener('resize', handleResize);
+    
+    // Start animation
+    animate();
+}
+
+// Neural Network Generation
+document.addEventListener('DOMContentLoaded', function() {
+    // Create Neural Network with Central Core
+    function createNeuralNetwork() {
+        const container = document.getElementById('networkNodes');
+        const svg = document.getElementById('networkSvg');
+        
+        if (!container || !svg) return;
+        
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        
+        // Generate nodes around the center
+        const nodeCount = 150; // Number of nodes to create
+        const nodes = [];
+        
+        for (let i = 0; i < nodeCount; i++) {
+            // Create node element
+            const node = document.createElement('div');
+            node.className = 'network-node';
+            
+            // Position nodes in clusters around the center
+            const angle = (i / nodeCount) * Math.PI * 2;
+            const distance = 100 + Math.random() * 400; // Distance from center
+            const variation = (Math.random() - 0.5) * 100; // Random variation
+            
+            const x = centerX + Math.cos(angle) * distance + variation;
+            const y = centerY + Math.sin(angle) * distance + variation;
+            
+            // Ensure nodes stay within viewport
+            const finalX = Math.max(20, Math.min(window.innerWidth - 20, x));
+            const finalY = Math.max(20, Math.min(window.innerHeight - 20, y));
+            
+            node.style.left = finalX + 'px';
+            node.style.top = finalY + 'px';
+            node.style.animationDelay = Math.random() * 4 + 's';
+            
+            container.appendChild(node);
+            nodes.push({ element: node, x: finalX, y: finalY });
+            
+            // Create connection line to center
+            if (Math.random() > 0.3) { // 70% chance of connection
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('class', 'connection-line');
+                line.setAttribute('x1', centerX);
+                line.setAttribute('y1', centerY);
+                line.setAttribute('x2', finalX);
+                line.setAttribute('y2', finalY);
+                line.style.animationDelay = Math.random() * 2 + 's';
+                
+                svg.appendChild(line);
+            }
+        }
+        
+        // Animate network activity
+        function activateRandomNodes() {
+            const randomNodes = nodes.sort(() => 0.5 - Math.random()).slice(0, 5);
+            randomNodes.forEach((nodeData, index) => {
+                setTimeout(() => {
+                    nodeData.element.classList.add('active');
+                    setTimeout(() => {
+                        nodeData.element.classList.remove('active');
+                    }, 500);
+                }, index * 100);
+            });
+        }
+        
+        // Pulse connections periodically
+        function pulseConnections() {
+            const connections = svg.querySelectorAll('.connection-line');
+            const randomConnections = Array.from(connections)
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 10);
+            
+            randomConnections.forEach((connection, index) => {
+                setTimeout(() => {
+                    connection.classList.add('pulse');
+                    setTimeout(() => {
+                        connection.classList.remove('pulse');
+                    }, 2000);
+                }, index * 50);
+            });
+        }
+        
+        // Start animations
+        setInterval(activateRandomNodes, 3000);
+        setInterval(pulseConnections, 4000);
+        
+        // Create data flow particles
+        function createDataParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'data-particle';
+            
+            // Random start position from nodes
+            const startNode = nodes[Math.floor(Math.random() * nodes.length)];
+            const startX = startNode.x;
+            const startY = startNode.y;
+            
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+            
+            container.appendChild(particle);
+            
+            // Animate to center
+            const duration = 1500 + Math.random() * 1000;
+            particle.style.transition = `all ${duration}ms linear`;
+            particle.style.opacity = '1';
+            
+            setTimeout(() => {
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.opacity = '0';
+            }, 50);
+            
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, duration + 100);
+        }
+        
+        // Create data particles periodically
+        setInterval(createDataParticle, 800);
+    }
+    
+    // Initialize neural network
+    createNeuralNetwork();
+    
+    // Recreate on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const container = document.getElementById('networkNodes');
+            const svg = document.getElementById('networkSvg');
+            if (container && svg) {
+                container.innerHTML = '';
+                svg.innerHTML = '';
+                createNeuralNetwork();
+            }
+        }, 250);
+    });
+    
+    const typingElement = document.getElementById('typingText');
+    const words = ['Amazing', 'Powerful', 'Revolutionary', 'Game-Changing', 'Innovative'];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function typeWriter() {
+        const currentWord = words[wordIndex];
+        
+        if (isDeleting) {
+            typingElement.textContent = currentWord.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            typingElement.textContent = currentWord.substring(0, charIndex + 1);
+            charIndex++;
+        }
+
+        if (!isDeleting && charIndex === currentWord.length) {
+            setTimeout(() => { isDeleting = true; }, 2000);
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            wordIndex = (wordIndex + 1) % words.length;
+        }
+
+        const speed = isDeleting ? 100 : 150;
+        setTimeout(typeWriter, speed);
+    }
+
+    typeWriter();
+
+    // Enhanced search suggestions for hero search
+    const heroSearchInput = document.getElementById('heroSearchInput');
+    const heroSearchSuggestions = document.getElementById('heroSearchSuggestions');
+    
+    const popularSearches = [
+        'ChatGPT alternatives', 'AI writing tools', 'Image generators', 
+        'Code assistants', 'Video creators', 'Voice cloning', 
+        'SEO tools', 'Design assistants', 'Data analysis', 'Automation tools'
+    ];
+    
+    if (heroSearchInput && heroSearchSuggestions) {
+        heroSearchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                const suggestions = popularSearches.filter(item => 
+                    item.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (suggestions.length > 0) {
+                    heroSearchSuggestions.innerHTML = suggestions.map(suggestion => 
+                        `<div class="search-suggestion-item" onclick="selectHeroSuggestion('${suggestion}')">${suggestion}</div>`
+                    ).join('');
+                    heroSearchSuggestions.style.display = 'block';
+                } else {
+                    heroSearchSuggestions.style.display = 'none';
+                }
+            } else {
+                heroSearchSuggestions.style.display = 'none';
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!heroSearchInput.contains(e.target) && !heroSearchSuggestions.contains(e.target)) {
+                heroSearchSuggestions.style.display = 'none';
+            }
+        });
+    }
+
+    // Regular search suggestions (if exists)
+    const searchInput = document.getElementById('searchInput');
+    const searchSuggestions = document.getElementById('searchSuggestions');
+    
+    if (searchInput && searchSuggestions) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                const suggestions = popularSearches.filter(item => 
+                    item.toLowerCase().includes(query)
+                ).slice(0, 5);
+                
+                if (suggestions.length > 0) {
+                    searchSuggestions.innerHTML = suggestions.map(suggestion => 
+                        `<div class="search-suggestion-item" onclick="selectSuggestion('${suggestion}')">${suggestion}</div>`
+                    ).join('');
+                    searchSuggestions.style.display = 'block';
+                } else {
+                    searchSuggestions.style.display = 'none';
+                }
+            } else {
+                searchSuggestions.style.display = 'none';
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                searchSuggestions.style.display = 'none';
+            }
+        });
+    }
+});
+
+function selectHeroSuggestion(suggestion) {
+    const heroSearchInput = document.getElementById('heroSearchInput');
+    const heroSearchSuggestions = document.getElementById('heroSearchSuggestions');
+    
+    if (heroSearchInput) {
+        heroSearchInput.value = suggestion;
+        heroSearchSuggestions.style.display = 'none';
+        // Submit the form
+        heroSearchInput.closest('form').submit();
+    }
+}
+
+function selectSuggestion(suggestion) {
+    const searchInput = document.getElementById('searchInput');
+    const searchSuggestions = document.getElementById('searchSuggestions');
+    
+    if (searchInput) {
+        searchInput.value = suggestion;
+        searchSuggestions.style.display = 'none';
+        // Submit the form
+        searchInput.closest('form').submit();
+    }
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// Add loading animation for buttons
+document.querySelectorAll('.btn').forEach(button => {
+    button.addEventListener('click', function() {
+        if (this.type === 'submit' || this.href) {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Loading...';
+            this.disabled = true;
+            
+            // Reset after 3 seconds if still on page
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 3000);
+        }
+    });
+});
+
+// Newsletter subscription
+const newsletterForm = document.querySelector('.newsletter-card form');
+if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        
+        // Simple validation
+        if (email && email.includes('@')) {
+            alert('Thank you for subscribing! We\'ll keep you updated with the latest AI tools.');
+            this.querySelector('input[type="email"]').value = '';
+        } else {
+            alert('Please enter a valid email address.');
+        }
+    });
+}
+
+// Intersection Observer for animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Observe elements for scroll animations
+document.querySelectorAll('.glass-card, .tool-card, .testimonial-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+});
+
+// Add hover sound effect (optional)
+function addHoverSounds() {
+    document.querySelectorAll('.btn, .category-pill, .tool-card').forEach(element => {
+        element.addEventListener('mouseenter', () => {
+            // Optional: Add subtle hover sound effect
+            // You can uncomment the line below if you want to add sound
+            // new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEhBS+C0fPadSYGFWGz8+iXSQwHVrjl+K1zJAhGksft0YIANAVu4NcDAjAA').play();
+        });
+    });
+}
+
+// Initialize hover sounds
+addHoverSounds();
+</script>
+{% endblock %}

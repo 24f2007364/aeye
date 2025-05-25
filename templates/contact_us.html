@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="row g-4">
+                <!-- Contact Form -->
+                <div class="col-lg-7">
+                    <div class="card glass-card border-0">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="mb-4">
+                                <span class="badge bg-primary p-2 px-3 mb-3">
+                                    <i class="bi bi-chat-dots me-2"></i>Get in Touch
+                                </span>
+                                <h1 class="gradient-text fw-bold">Contact Us</h1>
+                                <p class="text-muted">Have a question, suggestion, or feedback? We'd love to hear from you!</p>
+                            </div>
+                            
+                            <form class="contact-form">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name" class="form-label">Your Name</label>
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control auth-input" id="name" name="name" required>
+                                                <i class="bi bi-person input-icon"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <div class="position-relative">
+                                                <input type="email" class="form-control auth-input" id="email" name="email" required>
+                                                <i class="bi bi-envelope input-icon"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control auth-input" id="subject" name="subject" required>
+                                        <i class="bi bi-chat input-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="form-group mt-3">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control auth-input" id="message" name="message" rows="5" required></textarea>
+                                </div>
+
+                                <div class="form-check mt-3">
+                                    <input type="checkbox" class="form-check-input" id="copy" name="copy">
+                                    <label class="form-check-label" for="copy">
+                                        Send me a copy of this message
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn auth-submit-btn mt-4">
+                                    <i class="bi bi-send me-2"></i>Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="col-lg-5">
+                    <div class="card glass-card border-0 mb-4">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3">Contact Information</h4>
+                            <ul class="contact-info-list list-unstyled">
+                                <li>
+                                    <div class="icon-box">
+                                        <i class="bi bi-envelope"></i>
+                                    </div>
+                                    <div class="info">
+                                        <h5>Email</h5>
+                                        <p><a href="mailto:support@aeyetools.com">support@aeyetools.com</a></p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="icon-box">
+                                        <i class="bi bi-clock"></i>
+                                    </div>
+                                    <div class="info">
+                                        <h5>Response Time</h5>
+                                        <p>We aim to respond within 24 hours</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="icon-box">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+                                    <div class="info">
+                                        <h5>Location</h5>
+                                        <p>Bengaluru, India</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card glass-card border-0">
+                        <div class="card-body p-4">
+                            <h4 class="mb-3">Frequently Asked Questions</h4>
+                            <div class="accordion" id="contact-faq">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                            How soon will I get a response?
+                                        </button>
+                                    </h2>
+                                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#contact-faq">
+                                        <div class="accordion-body">
+                                            We aim to respond to all inquiries within 24 hours during business days.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                            How do I report a bug?
+                                        </button>
+                                    </h2>
+                                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#contact-faq">
+                                        <div class="accordion-body">
+                                            Please use this contact form and include "Bug Report" in the subject line along with detailed steps to reproduce the issue.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                            Can I suggest a new feature?
+                                        </button>
+                                    </h2>
+                                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#contact-faq">
+                                        <div class="accordion-body">
+                                            Absolutely! We love hearing your ideas. Use this form with "Feature Request" in the subject line.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-input {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        border-radius: 12px;
+        color: #fff;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    textarea.auth-input {
+        resize: none;
+        padding-right: 1rem;
+    }
+    
+    .auth-input:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+    }
+    
+    .contact-info-list li {
+        display: flex;
+        margin-bottom: 1.5rem;
+        align-items: flex-start;
+    }
+    
+    .contact-info-list .icon-box {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0066FF 0%, #60A5FA 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #fff;
+        margin-right: 1rem;
+    }
+    
+    .contact-info-list .info h5 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
+    
+    .contact-info-list .info p {
+        color: var(--text-muted);
+        margin-bottom: 0;
+    }
+    
+    .contact-info-list .info a {
+        color: var(--accent-blue);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-info-list .info a:hover {
+        color: var(--primary-blue);
+    }
+    
+    .accordion-item {
+        background-color: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+    
+    .accordion-button {
+        background-color: transparent;
+        color: var(--text-primary);
+        font-weight: 500;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(0, 102, 255, 0.1);
+        color: var(--accent-blue);
+    }
+    
+    .accordion-body {
+        color: var(--text-muted);
+        padding: 1rem 1.25rem;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+    
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2360A5FA'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const contactForm = document.querySelector('.contact-form');
+    
+    if(contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate sending the form
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Sending...';
+            
+            setTimeout(() => {
+                // Show success message
+                contactForm.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="success-icon mb-3">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <h3>Message Sent!</h3>
+                        <p class="text-muted mb-4">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+                        <button type="button" class="btn btn-outline-primary" onclick="location.reload()">
+                            <i class="bi bi-arrow-left me-2"></i>Send Another Message
+                        </button>
+                    </div>
+                `;
+            }, 2000);
+        });
+    }
+});
+</script>
+
+<style>
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(34, 197, 94, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 2.5rem;
+        color: #22C55E;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .spin {
+        display: inline-block;
+        animation: spin 1s linear infinite;
+    }
+</style>
+{% endblock %}

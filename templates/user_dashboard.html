@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Aeye{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Blue Gradient Dashboard Theme */
+.dashboard-header {
+    background: var(--gradient-primary);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    border: 1px solid var(--primary-blue);
+    box-shadow: 0 10px 30px rgba(0, 102, 255, 0.15);
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--primary-blue);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
+    border-color: var(--accent-blue);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: var(--font-accent);
+}
+
+.section-card {
+    background: var(--bg-card);
+    border: 1px solid var(--primary-blue);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin-bottom: 2rem;
+}
+
+.bookmark-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 102, 255, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.bookmark-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.15);
+}
+
+.section-title {
+    font-family: var(--font-accent);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.rating-stars {
+    color: #FFC107;
+}
+
+.quick-action-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--primary-blue);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.quick-action-btn:hover {
+    background: var(--gradient-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.2);
+}
+
+.quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.activity-item {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0, 102, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Modern Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="h2 fw-bold mb-2" style="font-family: var(--font-accent);">
+                    <i class="bi bi-person-circle me-3"></i>Welcome back, {{ current_user.username }}!
+                </h1>
+                <p class="mb-0 opacity-90" style="font-size: 1.1rem;">Manage your bookmarks, reviews, and discover new AI tools</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('explore') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-search me-2"></i>Explore Tools
+                </a>
+            </div>
+        </div>
+    </div>
+      <!-- Enhanced Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ bookmarks|length }}</div>
+                <h6 class="fw-semibold mb-1 text-primary">Bookmarked Tools</h6>
+                <small class="text-muted">Your saved favorites</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ reviews|length }}</div>
+                <h6 class="fw-semibold mb-1 text-primary">Reviews Written</h6>
+                <small class="text-muted">Your contributions</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ current_user.created_at.strftime('%b') }}</div>
+                <h6 class="fw-semibold mb-1 text-primary">Member Since</h6>
+                <small class="text-muted">{{ current_user.created_at.strftime('%Y') }}</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-number">
+                    {% if reviews %}
+                        {% set total_rating = 0 %}
+                        {% for review in reviews %}
+                            {% set total_rating = total_rating + review.rating %}
+                        {% endfor %}
+                        {{ (total_rating / reviews|length)|round(1) }}
+                    {% else %}—{% endif %}
+                </div>
+                <h6 class="fw-semibold mb-1 text-primary">Avg Rating Given</h6>
+                <small class="text-muted">Your review average</small>
+            </div>
+        </div>
+    </div>    <!-- Main Content -->
+    <div class="row">
+        <!-- Bookmarked Tools -->
+        <div class="col-lg-8">
+            <div class="section-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="section-title mb-0">
+                        <i class="bi bi-bookmark-fill me-2 text-warning"></i>Your Bookmarks
+                    </h4>
+                    <a href="{{ url_for('explore') }}" class="btn btn-primary">
+                        <i class="bi bi-plus me-1"></i>Find More Tools
+                    </a>
+                </div>
+                
+                {% if bookmarks %}
+                <div class="row g-3">
+                    {% for bookmark in bookmarks %}
+                    <div class="col-md-6">
+                        <div class="bookmark-card">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if bookmark.tool.logo_url %}
+                                <img src="{{ bookmark.tool.logo_url }}" alt="{{ bookmark.tool.name }}" class="me-3 rounded" width="40" height="40">
+                                {% else %}
+                                <div class="rounded me-3 d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background: var(--gradient-primary);">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-white">{{ bookmark.tool.name }}</h6>
+                                    <span class="badge {% if bookmark.tool.pricing_model == 'Free' %}bg-success{% elif bookmark.tool.pricing_model == 'Paid' %}bg-primary{% else %}bg-info{% endif %}">
+                                        {{ 'Freemium' if bookmark.tool.pricing_model == 'Semi-Free' else bookmark.tool.pricing_model }}
+                                    </span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="toggleBookmark({{ bookmark.tool.id }})" title="Remove bookmark">
+                                    <i class="bi bi-bookmark-x"></i>
+                                </button>
+                            </div>
+                            <p class="text-muted small mb-3">
+                                {{ bookmark.tool.description[:80] }}{% if bookmark.tool.description|length > 80 %}...{% endif %}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Saved {{ bookmark.created_at.strftime('%b %d') }}</small>
+                                <a href="{{ url_for('tool_detail', tool_id=bookmark.tool.id) }}" class="btn btn-outline-primary btn-sm">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-bookmark display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted mb-3">No bookmarks yet</h5>
+                    <p class="text-muted mb-4">Start exploring and bookmark your favorite AI tools!</p>
+                    <a href="{{ url_for('explore') }}" class="btn btn-primary">
+                        <i class="bi bi-search me-2"></i>Explore Tools
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>        
+        <!-- Recent Activity -->
+        <div class="col-lg-4">
+            <div class="section-card">
+                <h5 class="section-title">
+                    <i class="bi bi-clock-history me-2"></i>Recent Reviews
+                </h5>
+                
+                {% if reviews %}
+                <div class="list-group list-group-flush">
+                    {% for review in reviews[:5] %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 text-white">{{ review.tool.name }}</h6>
+                                <div class="rating-stars mb-1">
+                                    {% for i in range(1, 6) %}
+                                    <i class="bi bi-star{% if i <= review.rating %}-fill{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">{{ review.version_type }} • {{ review.created_at.strftime('%b %d, %Y') }}</small>
+                            </div>
+                            <a href="{{ url_for('tool_detail', tool_id=review.tool.id) }}" class="btn btn-outline-primary btn-sm" title="View tool details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                        {% if review.review_text %}
+                        <p class="text-muted small mt-2 mb-0">
+                            "{{ review.review_text[:60] }}{% if review.review_text|length > 60 %}...{% endif %}"
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if reviews|length > 5 %}
+                <div class="text-center mt-3">
+                    <button class="btn btn-outline-primary btn-sm">View All Reviews</button>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-chat-square display-4 text-muted mb-3"></i>
+                    <p class="text-muted">No reviews written yet</p>
+                    <a href="{{ url_for('explore') }}" class="btn btn-outline-primary btn-sm">
+                        Find Tools to Review
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="section-card">
+                <h5 class="section-title">
+                    <i class="bi bi-lightning me-2"></i>Quick Actions
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('explore') }}" class="quick-action-btn">
+                            <i class="bi bi-search quick-action-icon"></i>
+                            <strong>Explore Tools</strong>
+                            <small class="d-block text-muted mt-1">Discover new AI tools</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('explore', pricing='Free') }}" class="quick-action-btn">
+                            <i class="bi bi-gift quick-action-icon"></i>
+                            <strong>Free Tools</strong>
+                            <small class="d-block text-muted mt-1">Find free alternatives</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('explore', sort='newest') }}" class="quick-action-btn">
+                            <i class="bi bi-stars quick-action-icon"></i>
+                            <strong>New Releases</strong>
+                            <small class="d-block text-muted mt-1">Latest AI innovations</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('register') }}?advertiser=1" class="quick-action-btn" title="Become an advertiser">
+                            <i class="bi bi-megaphone quick-action-icon"></i>
+                            <strong>Become Advertiser</strong>
+                            <small class="d-block text-muted mt-1">Promote your tools</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

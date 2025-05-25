@@ -1,0 +1,981 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tool.name }} - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Tool Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if tool.logo_url %}
+                            <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" class="me-4 rounded" width="80" height="80">
+                            {% else %}
+                            <div class="bg-gradient rounded me-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="bi bi-robot text-white fs-1"></i>
+                            </div>
+                            {% endif %}
+                            <div>                                <h1 class="h2 fw-bold text-white mb-2" style="font-family: var(--font-accent);">{{ tool.name }}</h1>
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <span class="badge {% if tool.pricing_model == 'Free' %}bg-success{% elif tool.pricing_model == 'Paid' %}bg-primary{% else %}bg-info{% endif %} fs-6" style="font-family: var(--font-primary);">
+                                        {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                    </span>
+                                    {% if tool.is_featured %}
+                                    <span class="badge bg-warning text-dark" style="font-family: var(--font-primary);">
+                                        <i class="bi bi-star-fill me-1"></i>Featured
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-4 text-muted" style="font-family: var(--font-primary);">
+                                    <span><i class="bi bi-eye me-1"></i>{{ tool.click_count }} views</span>
+                                    <span><i class="bi bi-chat me-1"></i>{{ (free_reviews + paid_reviews)|length }} reviews</span>
+                                    <span><i class="bi bi-calendar me-1"></i>{{ tool.created_at.strftime('%B %Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    <div class="col-md-4 text-md-end">
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{{ tool.website_url }}" target="_blank" class="btn btn-gradient btn-lg" style="font-family: var(--font-primary);">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Visit Website
+                            </a>
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-outline-light" onclick="toggleBookmark({{ tool.id }})" data-tool-id="{{ tool.id }}" style="font-family: var(--font-primary);">
+                                <i class="bi {% if is_bookmarked %}bi-bookmark-fill{% else %}bi-bookmark{% endif %} me-2"></i>
+                                {% if is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      <!-- Tool Details and Reviews -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Description -->
+            <div class="glass-card p-4 mb-4">
+                <h3 class="h5 fw-bold mb-3" style="font-family: var(--font-accent);">
+                    <i class="bi bi-info-circle me-2"></i>About {{ tool.name }}
+                </h3>
+                <p class="text-light lh-lg" style="font-family: var(--font-primary);">{{ tool.description }}</p>
+                  {% if tool.tags %}
+                <div class="mt-4">
+                    <h6 class="text-muted mb-3" style="font-family: var(--font-primary);">Categories</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in tool.tags|from_json %}
+                        <a href="{{ url_for('explore', tags=tag) }}" class="category-tag-item text-decoration-none">
+                            {{ tag }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Community Comments Section -->
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="h5 fw-bold mb-0" style="font-family: var(--font-accent);">
+                        <i class="bi bi-chat-dots me-2"></i>Community Comments
+                    </h3>
+                    <span class="badge bg-primary fs-6">{{ comments|length }} comments</span>
+                </div>
+                
+                <!-- Add Comment Form (for signed-in users) -->
+                {% if current_user.is_authenticated %}
+                <div class="mb-4">
+                    <form id="commentForm" class="d-flex gap-3">
+                        <div class="comment-avatar">
+                            <div class="bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <span class="text-white fw-bold">{{ current_user.username[0].upper() }}</span>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <textarea class="form-control bg-transparent border-secondary" 
+                                      id="commentContent" 
+                                      rows="3" 
+                                      placeholder="Share your thoughts about {{ tool.name }}..."
+                                      required></textarea>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-gradient btn-sm">
+                                    <i class="bi bi-send me-1"></i>Post Comment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <!-- CTA for non-signed-in users -->
+                <div class="text-center py-4 mb-4 border border-secondary rounded">
+                    <i class="bi bi-chat-heart text-muted display-6 mb-3"></i>
+                    <h6 class="mb-2">Join the Conversation</h6>
+                    <p class="text-muted mb-3">Share your thoughts and connect with the AI community!</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm">Sign In</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-gradient btn-sm">Join Aeye</a>
+                    </div>
+                </div>
+                {% endif %}
+                  <!-- Comments List -->
+                <div id="commentsList">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        {% if not comment.parent_id %}
+                        <div class="comment-thread mb-4" data-comment-id="{{ comment.id }}">
+                            <!-- Main Comment -->
+                            <div class="d-flex comment-item">
+                                <div class="comment-avatar">
+                                    <div class="bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <span class="text-white fw-bold">{{ comment.user.username[0].upper() }}</span>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="comment-content">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <h6 class="mb-0 fw-bold text-light">{{ comment.user.username }}</h6>
+                                            <small class="text-muted">{{ comment.created_at.strftime('%b %d') }}</small>
+                                        </div>
+                                        <p class="mb-2 text-light">{{ comment.content }}</p>
+                                    </div>
+                                    <div class="comment-actions d-flex align-items-center gap-3">
+                                        {% if current_user.is_authenticated %}
+                                        <button class="comment-action like-btn p-0 border-0 bg-transparent text-muted" 
+                                                data-comment-id="{{ comment.id }}"
+                                                data-liked="{{ comment.id in user_liked_comments if user_liked_comments else false }}">
+                                            <i class="bi bi-heart{% if user_liked_comments and comment.id in user_liked_comments %}-fill text-danger{% endif %} me-1"></i>
+                                            <span class="like-count">{{ comment.likes_count }}</span>
+                                        </button>
+                                        <button class="comment-action reply-btn p-0 border-0 bg-transparent text-muted" 
+                                                data-comment-id="{{ comment.id }}"
+                                                onclick="toggleReplyForm({{ comment.id }})">
+                                            <i class="bi bi-reply me-1"></i>Reply
+                                        </button>
+                                        {% else %}
+                                        <span class="text-muted small">
+                                            <i class="bi bi-heart me-1"></i>{{ comment.likes_count }} likes
+                                        </span>
+                                        {% endif %}
+                                        <small class="text-muted">{{ comment.created_at.strftime('%I:%M %p') }}</small>
+                                    </div>
+                                    
+                                    <!-- Reply Form (hidden by default) -->
+                                    {% if current_user.is_authenticated %}
+                                    <div class="reply-form-container mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                        <div class="d-flex gap-2">
+                                            <div class="comment-avatar">
+                                                <div class="bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                    <span class="text-white fw-bold small">{{ current_user.username[0].upper() }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <textarea class="form-control form-control-sm bg-transparent border-secondary" 
+                                                          id="reply-textarea-{{ comment.id }}"
+                                                          rows="2" 
+                                                          placeholder="Write a reply..."
+                                                          required></textarea>
+                                                <div class="d-flex justify-content-end gap-2 mt-2">
+                                                    <button type="button" class="btn btn-sm btn-secondary" onclick="cancelReply({{ comment.id }})">Cancel</button>
+                                                    <button type="button" class="btn btn-sm btn-gradient" onclick="submitReply({{ comment.id }})">Reply</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Replies -->
+                                    {% set reply_count = all_comments|selectattr('parent_id', 'equalto', comment.id)|list|length if all_comments else 0 %}
+                                    {% if reply_count > 0 %}
+                                    <div class="replies mt-3" id="replies-{{ comment.id }}">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <button class="btn btn-sm btn-link text-primary p-0" onclick="toggleReplies({{ comment.id }})">
+                                                <i class="bi bi-chevron-down me-1" id="replies-toggle-{{ comment.id }}"></i>
+                                                View {{ reply_count }} {{ 'reply' if reply_count == 1 else 'replies' }}
+                                            </button>
+                                        </div>
+                                        <div class="replies-container" id="replies-container-{{ comment.id }}" style="display: none;">
+                                            {% for reply in all_comments %}
+                                            {% if reply.parent_id == comment.id %}
+                                            <div class="reply-item d-flex gap-2 mb-3" data-comment-id="{{ reply.id }}">
+                                                <div class="comment-avatar">
+                                                    <div class="bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                        <span class="text-white fw-bold small">{{ reply.user.username[0].upper() }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        <h6 class="mb-0 small fw-bold text-light">{{ reply.user.username }}</h6>
+                                                        <small class="text-muted">{{ reply.created_at.strftime('%b %d') }}</small>
+                                                    </div>
+                                                    <p class="mb-1 small text-light">{{ reply.content }}</p>
+                                                    <div class="comment-actions d-flex align-items-center gap-2">
+                                                        {% if current_user.is_authenticated %}
+                                                        <button class="comment-action like-btn p-0 border-0 bg-transparent text-muted small" 
+                                                                data-comment-id="{{ reply.id }}"
+                                                                data-liked="{{ reply.id in user_liked_comments if user_liked_comments else false }}">
+                                                            <i class="bi bi-heart{% if user_liked_comments and reply.id in user_liked_comments %}-fill text-danger{% endif %} me-1"></i>
+                                                            <span class="like-count">{{ reply.likes_count }}</span>
+                                                        </button>
+                                                        {% else %}
+                                                        <span class="text-muted small">
+                                                            <i class="bi bi-heart me-1"></i>{{ reply.likes_count }} likes
+                                                        </span>
+                                                        {% endif %}
+                                                        <small class="text-muted">{{ reply.created_at.strftime('%I:%M %p') }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-chat-square display-4 mb-3"></i>
+                        <h6 class="mb-2">No comments yet</h6>
+                        <p>Be the first to share your thoughts about {{ tool.name }}!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+          <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Info -->
+            <div class="glass-card p-4 mb-4">
+                <h5 class="fw-bold mb-3" style="font-family: var(--font-accent);">
+                    <i class="bi bi-info-square me-2"></i>Quick Info
+                </h5>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 fw-bold text-primary" style="font-family: var(--font-accent);">{{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}</div>
+                            <small class="text-muted" style="font-family: var(--font-primary);">Pricing</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 fw-bold text-primary" style="font-family: var(--font-accent);">{{ tool.click_count }}</div>
+                            <small class="text-muted" style="font-family: var(--font-primary);">Views</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 fw-bold text-primary" style="font-family: var(--font-accent);">{{ (free_reviews + paid_reviews)|length }}</div>
+                            <small class="text-muted" style="font-family: var(--font-primary);">Reviews</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 fw-bold text-primary" style="font-family: var(--font-accent);">{{ tool.created_at.strftime('%Y') }}</div>
+                            <small class="text-muted" style="font-family: var(--font-primary);">Listed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews & Ratings -->
+            <div class="glass-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0" style="font-family: var(--font-accent);">
+                        <i class="bi bi-chat-square-text me-2"></i>Reviews & Ratings
+                    </h5>
+                    {% if current_user.is_authenticated and not current_user.is_advertiser %}
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Rating Summary -->
+                <div class="row mb-3">
+                    <div class="col-12 mb-3">
+                        <div class="neuro-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Free Version</h6>
+                            <div class="h4 fw-bold gradient-text mb-2">
+                                {{ "%.1f"|format(free_avg) if free_avg > 0 else "—" }}
+                            </div>
+                            <div class="rating-stars mb-2">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if free_avg >= i %}-fill{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">{{ free_reviews|length }} reviews</small>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="neuro-card p-3 text-center">
+                            <h6 class="text-muted mb-2">Paid Version</h6>
+                            <div class="h4 fw-bold gradient-text mb-2">
+                                {{ "%.1f"|format(paid_avg) if paid_avg > 0 else "—" }}
+                            </div>
+                            <div class="rating-stars mb-2">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if paid_avg >= i %}-fill{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">{{ paid_reviews|length }} reviews</small>
+                        </div>
+                    </div>
+                </div>                <!-- Recent Reviews -->
+                <div class="recent-reviews">                    <h6 class="text-muted mb-3">Recent Reviews</h6>
+                    {% set recent_reviews = (free_reviews + paid_reviews)|sort(attribute='created_at', reverse=True) %}
+                    {% if recent_reviews %}
+                    {% for review in recent_reviews %}
+                    {% if loop.index <= 3 %}
+                    <div class="border-bottom border-secondary pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <small class="fw-bold">{{ review.user.username }}</small>
+                            <div class="rating-stars small">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if review.rating >= i %}-fill{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if review.review_text %}
+                        <p class="small text-muted mb-1">{{ review.review_text|truncate(80) }}</p>
+                        {% endif %}
+                        <small class="text-muted">{{ review.version_type }} • {{ review.created_at.strftime('%B %d') }}</small>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-chat-square mb-2"></i>
+                        <p class="small mb-0">No reviews yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Similar Tools -->
+            <div class="glass-card p-4">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-collection me-2"></i>Similar Tools
+                </h5>
+                <div class="text-center text-muted py-3">
+                    <i class="bi bi-gear display-4 mb-2"></i>
+                    <p class="small">Related tools coming soon</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+{% if current_user.is_authenticated %}
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Add Your Review</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_review', tool_id=tool.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Version Type</label>
+                        <select class="form-select bg-transparent" name="version_type" required>
+                            <option value="">Select version</option>
+                            <option value="Free">Free Version</option>
+                            <option value="Paid">Paid Version</option>
+                        </select>
+                    </div>                      <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <div class="rating-input" id="ratingInput">
+                            {% for i in range(1, 6) %}
+                            <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" required>
+                            <label for="star{{ i }}" class="star-label" data-rating="{{ i }}">
+                                <i class="bi bi-star-fill"></i>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted mt-1" id="ratingText">Click to rate</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Review (Optional)</label>
+                        <textarea class="form-control bg-transparent" 
+                                  name="review_text" 
+                                  rows="4" 
+                                  placeholder="Share your experience with this tool..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Blue Gradient Theme */
+:root {
+    --comment-bg: rgba(30, 41, 59, 0.6);
+    --reply-bg: rgba(51, 65, 85, 0.4);
+    --comment-border: rgba(96, 165, 250, 0.1);
+    --comment-hover: rgba(96, 165, 250, 0.05);
+    --accent-blue: #60A5FA;
+    --primary-blue: #0066FF;
+}
+
+.rating-input {
+    display: flex;
+    flex-direction: row;
+    gap: 0.2rem;
+}
+
+.rating-input input[type="radio"] {
+    display: none;
+}
+
+.star-label {
+    color: #6c757d;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.star-label:hover,
+.star-label.active {
+    color: var(--accent-blue);
+}
+
+.rating-input input[type="radio"]:checked ~ .star-label,
+.rating-input input[type="radio"]:checked ~ .star-label ~ .star-label {
+    color: var(--accent-blue);
+}
+
+.rating-stars i {
+    color: var(--accent-blue);
+}
+
+/* Facebook-Style Comment System */
+.comment-thread {
+    border-left: 2px solid var(--comment-border);
+    padding-left: 1.5rem;
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+}
+
+.comment-item {
+    padding: 0.75rem 0;
+    transition: background-color 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.comment-item:hover {
+    background: var(--comment-hover);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin: 0.25rem -1rem;
+}
+
+.comment-avatar {
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+}
+
+.comment-content {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 0.75rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.comment-actions {
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.comment-action {
+    color: var(--text-muted) !important;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.comment-action:hover {
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--primary-color) !important;
+}
+
+.reply-form-container {
+    padding-left: 1rem;
+    border-left: 2px solid rgba(var(--primary-rgb), 0.3);
+    margin-left: 2rem;
+}
+
+.replies-container {
+    padding-left: 1rem;
+    border-left: 2px solid rgba(var(--primary-rgb), 0.2);
+    margin-left: 2rem;
+}
+
+.reply-item {
+    margin-bottom: 0.75rem;
+}
+
+.reply-item .comment-content {
+    background: rgba(30, 41, 59, 0.3);
+    padding: 0.5rem 0.75rem;
+}
+
+.like-btn:hover .bi-heart {
+    color: #dc3545 !important;
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+.comment-thread {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1.5rem;
+}
+
+.comment-thread:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+}
+
+.reply-form {
+    margin-top: 0.75rem;
+    margin-left: 2rem;
+}
+
+.reply-input {
+    background: var(--reply-bg) !important;
+    border: 1px solid var(--comment-border) !important;
+    border-radius: 20px !important;
+    padding: 0.5rem 1rem !important;
+    color: white !important;
+    resize: none;
+}
+
+.reply-input:focus {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+.btn-reply {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+    border: none;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 16px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-reply:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(6, 102, 255, 0.3);
+}
+}
+
+.comment-content {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-actions {
+    margin-top: 0.5rem;
+}
+
+.like-btn:hover {
+    color: #dc3545 !important;
+}
+
+.like-btn.liked i {
+    color: #dc3545 !important;
+}
+
+.reply-item {
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.reply-form {
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+}
+
+.recent-reviews .border-bottom:last-child {
+    border-bottom: none !important;
+}
+
+.neuro-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Facebook-style comment functions
+function showReplyForm(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'block';
+        const textarea = document.getElementById(`reply-textarea-${commentId}`);
+        if (textarea) {
+            textarea.focus();
+        }
+    }
+}
+
+function hideReplyForm(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'none';
+        const textarea = document.getElementById(`reply-textarea-${commentId}`);
+        if (textarea) {
+            textarea.value = '';
+        }
+    }
+}
+
+function toggleReplies(commentId) {
+    const repliesContainer = document.getElementById(`replies-${commentId}`);
+    const toggleBtn = document.querySelector(`[onclick="toggleReplies(${commentId})"]`);
+    
+    if (repliesContainer && toggleBtn) {
+        if (repliesContainer.style.display === 'none') {
+            repliesContainer.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="bi bi-chat me-1"></i>Hide replies';
+        } else {
+            repliesContainer.style.display = 'none';
+            const replyCount = repliesContainer.children.length;
+            toggleBtn.innerHTML = `<i class="bi bi-chat me-1"></i>${replyCount} replies`;
+        }
+    }
+}
+
+function submitReply(commentId) {
+    const textarea = document.getElementById(`reply-textarea-${commentId}`);
+    if (textarea && textarea.value.trim()) {
+        // Add your AJAX submission logic here
+        fetch(`/api/comments/${commentId}/reply`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name=csrf-token]')?.getAttribute('content')
+            },
+            body: JSON.stringify({
+                content: textarea.value.trim()
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Simple reload for now
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+// Set global variables
+window.TOOL_ID = {{ tool.id }};
+
+// Star rating functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingInput = document.getElementById('ratingInput');
+    const ratingText = document.getElementById('ratingText');
+    
+    if (ratingInput) {
+        const starLabels = ratingInput.querySelectorAll('.star-label');
+        
+        starLabels.forEach((label) => {
+            const rating = parseInt(label.dataset.rating);
+            
+            label.addEventListener('click', function() {
+                // Check the corresponding radio input
+                const radioInput = ratingInput.querySelector(`input[value="${rating}"]`);
+                radioInput.checked = true;
+                
+                // Update visual feedback
+                updateStarDisplay(rating);
+                updateRatingText(rating);
+            });
+            
+            label.addEventListener('mouseenter', function() {
+                updateStarDisplay(rating);
+                updateRatingText(rating);
+            });
+        });
+        
+        ratingInput.addEventListener('mouseleave', function() {
+            const checkedInput = ratingInput.querySelector('input[type="radio"]:checked');
+            if (checkedInput) {
+                updateStarDisplay(parseInt(checkedInput.value));
+                updateRatingText(parseInt(checkedInput.value));
+            } else {
+                updateStarDisplay(0);
+                ratingText.textContent = 'Click to rate';
+            }
+        });
+        
+        function updateStarDisplay(rating) {
+            starLabels.forEach(label => {
+                const starRating = parseInt(label.dataset.rating);
+                if (starRating <= rating) {
+                    label.style.color = '#ffc107';
+                } else {
+                    label.style.color = '#6c757d';
+                }
+            });
+        }
+        
+        function updateRatingText(rating) {
+            const ratingTexts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            ratingText.textContent = rating > 0 ? ratingTexts[rating] : 'Click to rate';
+        }
+    }
+
+    // Initialize comment system
+    initializeCommentSystem();
+});
+
+function initializeCommentSystem() {
+    // Handle main comment form submission
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('commentContent').value.trim();
+            if (content) {
+                submitComment(content);
+            }
+        });
+    }
+
+    // Handle like buttons - use event delegation for dynamically added content
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.like-btn')) {
+            const button = e.target.closest('.like-btn');
+            const commentId = button.dataset.commentId;
+            toggleCommentLike(commentId, button);
+        }
+    });
+}
+
+// Global functions for inline event handlers
+function toggleReplyForm(commentId) {
+    // Hide all reply forms first
+    document.querySelectorAll('[id^="reply-form-"]').forEach(form => {
+        form.style.display = 'none';
+    });
+    
+    // Show the specific reply form
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'block';
+        const textarea = document.getElementById(`reply-textarea-${commentId}`);
+        if (textarea) {
+            textarea.focus();
+        }
+    }
+}
+
+function cancelReply(commentId) {
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    const textarea = document.getElementById(`reply-textarea-${commentId}`);
+    
+    if (replyForm) {
+        replyForm.style.display = 'none';
+    }
+    if (textarea) {
+        textarea.value = '';
+    }
+}
+
+function toggleReplies(commentId) {
+    const repliesContainer = document.getElementById(`replies-container-${commentId}`);
+    const toggleIcon = document.getElementById(`replies-toggle-${commentId}`);
+    const toggleButton = toggleIcon.closest('button');
+    
+    if (repliesContainer && toggleIcon) {
+        if (repliesContainer.style.display === 'none') {
+            repliesContainer.style.display = 'block';
+            toggleIcon.className = 'bi bi-chevron-up me-1';
+            toggleButton.innerHTML = toggleButton.innerHTML.replace('View', 'Hide');
+        } else {
+            repliesContainer.style.display = 'none';
+            toggleIcon.className = 'bi bi-chevron-down me-1';
+            toggleButton.innerHTML = toggleButton.innerHTML.replace('Hide', 'View');
+        }
+    }
+}
+
+function submitReply(commentId) {
+    const textarea = document.getElementById(`reply-textarea-${commentId}`);
+    const content = textarea.value.trim();
+    
+    if (!content) {
+        alert('Please enter a reply message.');
+        return;
+    }
+    
+    if (!window.TOOL_ID) {
+        alert('Error: Tool ID not found');
+        return;
+    }
+    
+    // Find the reply button and disable it
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    const submitBtn = replyForm.querySelector('.btn-gradient');
+    
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Posting...';
+    }
+    
+    const requestData = { 
+        content: content,
+        parent_id: commentId
+    };
+    
+    fetch('/add-comment/' + window.TOOL_ID, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Clear the form and hide it
+            textarea.value = '';
+            replyForm.style.display = 'none';
+            
+            // Reload the page to show the new reply
+            window.location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('An error occurred while posting your reply: ' + error.message);
+    })
+    .finally(() => {
+        // Re-enable the button
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Reply';
+        }
+    });
+}
+
+// Legacy functions to maintain compatibility
+function handleReplySubmit(event, form) {
+    // This function is no longer used but kept for compatibility
+    event.preventDefault();
+}
+
+function hideReplyForm(button) {
+    // This function is no longer used but kept for compatibility
+    const replyForm = button.closest('.reply-form-container');
+    if (replyForm) {
+        replyForm.style.display = 'none';
+    }
+}
+
+function submitComment(content) {
+    const toolId = window.TOOL_ID;
+    
+    fetch('/add-comment/' + toolId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show the new comment
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while posting your comment.');
+    });
+}
+
+function toggleCommentLike(commentId, button) {
+    fetch('/toggle-comment-like/' + commentId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the like count
+            const likeCountSpan = button.querySelector('.like-count');
+            if (likeCountSpan) {
+                likeCountSpan.textContent = data.likes_count;
+            }
+            
+            // Update the heart icon
+            const heartIcon = button.querySelector('i');
+            if (heartIcon) {
+                if (data.liked) {
+                    heartIcon.className = 'bi bi-heart-fill text-danger me-1';
+                    button.dataset.liked = 'true';
+                } else {
+                    heartIcon.className = 'bi bi-heart me-1';
+                    button.dataset.liked = 'false';
+                }
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the like.');
+    });
+}
+</script>
+{% endblock %}

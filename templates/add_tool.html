@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Add AI Tool - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card p-5">
+                <div class="text-center mb-4">
+                    <h1 class="h3 fw-bold gradient-text">
+                        <i class="bi bi-plus-circle me-2"></i>Add Your AI Tool
+                    </h1>
+                    <p class="text-muted">Share your AI tool with the Aeye community</p>
+                </div>
+                
+                <form method="POST">
+                    <div class="row g-4">
+                        <!-- Basic Information -->
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3">
+                                <i class="bi bi-info-circle me-2"></i>Basic Information
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Tool Name *</label>
+                            <input type="text" 
+                                   class="form-control bg-transparent" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="e.g., ChatGPT, Midjourney, etc."
+                                   required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="website_url" class="form-label">Website URL *</label>
+                            <input type="url" 
+                                   class="form-control bg-transparent" 
+                                   id="website_url" 
+                                   name="website_url" 
+                                   placeholder="https://yourtool.com"
+                                   required>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control bg-transparent" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="4" 
+                                      placeholder="Describe what your AI tool does, its key features, and benefits..."
+                                      required></textarea>
+                            <div class="form-text">Minimum 100 characters for better discovery</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="logo_url" class="form-label">Logo URL (Optional)</label>
+                            <input type="url" 
+                                   class="form-control bg-transparent" 
+                                   id="logo_url" 
+                                   name="logo_url" 
+                                   placeholder="https://yourtool.com/logo.png">
+                            <div class="form-text">Recommended: 200x200px, PNG or JPG</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="pricing_model" class="form-label">Pricing Model *</label>
+                            <select class="form-select bg-transparent" id="pricing_model" name="pricing_model" required>
+                                <option value="">Select pricing model</option>
+                                <option value="Free">Free - Completely free to use</option>
+                                <option value="Semi-Free">Freemium - Free with premium features</option>
+                                <option value="Paid">Paid - Requires subscription/payment</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3 mt-4">
+                                <i class="bi bi-tags me-2"></i>Categories & Tags
+                            </h5>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">Select Categories (Choose all that apply)</label>
+                            <div class="row g-2">
+                                {% set categories = [
+                                    'productivity', 'writing', 'design', 'coding', 'marketing', 
+                                    'video', 'audio', 'image-generation', 'data-analysis', 'automation',
+                                    'customer-service', 'education', 'research', 'translation', 'social-media',
+                                    'e-commerce', 'finance', 'healthcare', 'gaming', 'development'
+                                ] %}
+                                
+                                {% for category in categories %}
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               name="tags" 
+                                               value="{{ category }}" 
+                                               id="tag_{{ category }}">
+                                        <label class="form-check-label" for="tag_{{ category }}">
+                                            {{ category.replace('-', ' ').title() }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">Select at least 2 categories to help users find your tool</div>
+                        </div>
+                        
+                        <!-- Additional Information -->
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3 mt-4">
+                                <i class="bi bi-gear me-2"></i>Additional Details
+                            </h5>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="glass-card p-4">
+                                <h6 class="fw-bold mb-3">Submission Guidelines</h6>
+                                <ul class="text-muted mb-0">
+                                    <li>Ensure your tool is functional and accessible</li>
+                                    <li>Provide accurate pricing information</li>
+                                    <li>Use clear, descriptive language in your description</li>
+                                    <li>Tools are subject to review before approval</li>
+                                    <li>False or misleading information may result in removal</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms Agreement -->
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="terms_agreement" 
+                                       required>
+                                <label class="form-check-label" for="terms_agreement">
+                                    I confirm that I own or have permission to list this AI tool, and that all information provided is accurate. I agree to Aeye's Terms of Service.
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-center">
+                                <a href="{{ url_for('advertiser_dashboard') }}" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-gradient px-5">
+                                    <i class="bi bi-plus-circle me-2"></i>Submit Tool for Review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Character counter for description
+    document.addEventListener('DOMContentLoaded', function() {
+        const description = document.getElementById('description');
+        const counter = document.createElement('div');
+        counter.className = 'form-text';
+        counter.id = 'desc-counter';
+        description.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const length = description.value.length;
+            counter.textContent = `${length} characters`;
+            counter.className = `form-text ${length < 100 ? 'text-warning' : 'text-success'}`;
+        }
+        
+        description.addEventListener('input', updateCounter);
+        updateCounter();
+    });
+    
+    // Preview logo
+    document.getElementById('logo_url').addEventListener('input', function() {
+        const url = this.value;
+        const preview = document.getElementById('logo_preview');
+        
+        if (preview) {
+            preview.remove();
+        }
+        
+        if (url) {
+            const img = document.createElement('img');
+            img.id = 'logo_preview';
+            img.src = url;
+            img.className = 'mt-2 rounded';
+            img.style = 'width: 64px; height: 64px; object-fit: cover;';
+            img.onerror = function() {
+                this.style.display = 'none';
+            };
+            this.parentNode.appendChild(img);
+        }
+    });
+    
+    // Category counter
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'tags') {
+            const selected = document.querySelectorAll('input[name="tags"]:checked').length;
+            const hint = document.querySelector('input[name="tags"]').closest('.col-12').querySelector('.form-text');
+            
+            if (selected === 0) {
+                hint.textContent = 'Select at least 2 categories to help users find your tool';
+                hint.className = 'form-text text-warning';
+            } else if (selected === 1) {
+                hint.textContent = 'Select at least 1 more category';
+                hint.className = 'form-text text-warning';
+            } else {
+                hint.textContent = `${selected} categories selected - Great!`;
+                hint.className = 'form-text text-success';
+            }
+        }
+    });
+</script>
+{% endblock %}

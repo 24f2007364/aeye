@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="professional-card" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white;">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-6 fw-bold mb-2">
+                            <i class="bi bi-shield-check me-3"></i>Admin Control Panel
+                        </h1>
+                        <p class="mb-0 opacity-90">Comprehensive platform management and oversight</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+                            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addToolModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add Tool
+                            </button>
+                            <button type="button" class="btn btn-outline-light btn-sm" onclick="scrapeTools()">
+                                <i class="bi bi-cloud-download me-1"></i>Scrape Tools
+                            </button>
+                            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-box-arrow-right me-1"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="professional-card text-center">
+                <div style="color: var(--primary-color);" class="display-6 fw-bold mb-2">{{ tools|length }}</div>
+                <h6 class="fw-semibold mb-1">Total Tools</h6>
+                <small class="text-muted">All listed tools</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="professional-card text-center">
+                <div style="color: var(--success-color);" class="display-6 fw-bold mb-2">{{ users|length }}</div>
+                <h6 class="fw-semibold mb-1">Total Users</h6>
+                <small class="text-muted">Registered accounts</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="professional-card text-center">
+                <div style="color: var(--warning-color);" class="display-6 fw-bold mb-2">{{ pending_tools|length }}</div>
+                <h6 class="fw-semibold mb-1">Pending Review</h6>
+                <small class="text-muted">Awaiting approval</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="professional-card text-center">
+                <div style="color: var(--accent-color);" class="display-6 fw-bold mb-2">{{ users|selectattr('is_advertiser')|list|length }}</div>
+                <h6 class="fw-semibold mb-1">Advertisers</h6>
+                <small class="text-muted">Active promoters</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-pills nav-fill professional-card" style="padding: 0.5rem;">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#pending-tools">
+                        <i class="bi bi-clock me-2"></i>Pending Tools ({{ pending_tools|length }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#all-tools">
+                        <i class="bi bi-grid me-2"></i>All Tools ({{ tools|length }})
+                    </a>
+                </li>                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#campaigns-tab">
+                        <i class="bi bi-megaphone me-2"></i>Campaigns ({{ pending_campaigns|length }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#users-tab">
+                        <i class="bi bi-people me-2"></i>Users ({{ users|length }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#settings-tab">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Pending Tools Tab -->
+        <div class="tab-pane fade show active" id="pending-tools">
+            <div class="professional-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-semibold mb-0">
+                        <i class="bi bi-clock-history me-2" style="color: var(--warning-color);"></i>
+                        Tools Pending Approval
+                    </h4>
+                    {% if pending_tools %}
+                    <div>
+                        <button class="btn btn-outline-success btn-sm" onclick="approveAll()">
+                            <i class="bi bi-check-all me-1"></i>Approve All
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if pending_tools %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background: var(--bg-primary);">
+                            <tr>
+                                <th>Tool</th>
+                                <th>Advertiser</th>
+                                <th>Category</th>
+                                <th>Pricing</th>
+                                <th>Submitted</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tool in pending_tools %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if tool.logo_url %}
+                                        <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" 
+                                             class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="bi bi-robot" style="color: var(--text-muted);"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-semibold">{{ tool.name }}</div>
+                                            <small class="text-muted">{{ tool.website_url[:30] }}...</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ tool.advertiser.username }}</td>
+                                <td>
+                                    {% for tag in tool.tags|fromjson %}
+                                    <span class="tag-badge">{{ tag.replace('-', ' ').title() }}</span>
+                                    {% endfor %}                                </td>
+                                <td>
+                                    <span class="badge {% if tool.pricing_model == 'Free' %}bg-success{% elif tool.pricing_model == 'Semi-Free' %}bg-warning{% else %}bg-primary{% endif %}">
+                                        {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                    </span>
+                                </td>
+                                <td>{{ tool.created_at.strftime('%M/%d/%Y') }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-success btn-sm" onclick="approveTool({{ tool.id }})">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="viewTool({{ tool.id }})">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteTool({{ tool.id }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle display-1" style="color: var(--success-color);"></i>
+                    <h5 class="mt-3">All caught up!</h5>
+                    <p class="text-muted">No tools are pending approval at the moment.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- All Tools Tab -->
+        <div class="tab-pane fade" id="all-tools">
+            <div class="professional-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-semibold mb-0">
+                        <i class="bi bi-grid me-2" style="color: var(--primary-color);"></i>
+                        All Tools Management
+                    </h4>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control form-control-sm" id="toolSearch" 
+                               placeholder="Search tools..." style="width: 200px;">
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addToolModal">
+                            <i class="bi bi-plus me-1"></i>Add Tool
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover" id="toolsTable">
+                        <thead style="background: var(--bg-primary);">
+                            <tr>
+                                <th>Tool</th>
+                                <th>Status</th>
+                                <th>Pricing</th>
+                                <th>Clicks</th>
+                                <th>Added</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tool in tools %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if tool.logo_url %}
+                                        <img src="{{ tool.logo_url }}" alt="{{ tool.name }}" 
+                                             class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="bi bi-robot" style="color: var(--text-muted);"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-semibold">{{ tool.name }}</div>
+                                            <small class="text-muted">{{ tool.website_url[:40] }}...</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if tool.is_approved %}bg-success{% else %}bg-warning{% endif %}">
+                                        {% if tool.is_approved %}Approved{% else %}Pending{% endif %}
+                                    </span>
+                                    {% if tool.is_featured %}
+                                    <span class="badge bg-primary ms-1">Featured</span>
+                                    {% endif %}                                </td>
+                                <td>
+                                    <span class="badge {% if tool.pricing_model == 'Free' %}bg-success{% elif tool.pricing_model == 'Semi-Free' %}bg-warning{% else %}bg-primary{% endif %}">
+                                        {{ 'Freemium' if tool.pricing_model == 'Semi-Free' else tool.pricing_model }}
+                                    </span>
+                                </td>
+                                <td>{{ tool.click_count }}</td>
+                                <td>{{ tool.created_at.strftime('%m/%d/%Y') }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-info btn-sm" onclick="editTool({{ tool.id }})">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="toggleFeatured({{ tool.id }})">
+                                            <i class="bi bi-star"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteTool({{ tool.id }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Campaigns Tab -->
+        <div class="tab-pane fade" id="campaigns-tab">
+            <div class="professional-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-semibold mb-0">
+                        <i class="bi bi-megaphone me-2" style="color: var(--accent-color);"></i>
+                        Campaign Management
+                    </h4>
+                    {% if pending_campaigns %}
+                    <div>
+                        <button class="btn btn-outline-success btn-sm" onclick="approveAllCampaigns()">
+                            <i class="bi bi-check-all me-1"></i>Approve All
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if pending_campaigns %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background: var(--bg-primary);">
+                            <tr>
+                                <th>Campaign</th>
+                                <th>Tool</th>
+                                <th>Advertiser</th>
+                                <th>Budget</th>
+                                <th>Duration</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in pending_campaigns %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <div class="fw-semibold">{{ campaign.name }}</div>
+                                        <small class="text-muted">Target: {{ campaign.target_tags|fromjson|join(', ') if campaign.target_tags else 'All' }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if campaign.tool.logo_url %}
+                                        <img src="{{ campaign.tool.logo_url }}" alt="{{ campaign.tool.name }}" 
+                                             class="rounded me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-semibold">{{ campaign.tool.name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ campaign.advertiser.username }}</td>
+                                <td>
+                                    <strong>${{ "%.2f"|format(campaign.budget) }}</strong>
+                                    <small class="text-muted d-block">${{ "%.2f"|format(campaign.cost_per_view) }}/view, ${{ "%.2f"|format(campaign.cost_per_click) }}/click</small>
+                                </td>
+                                <td>{{ campaign.duration_days }} days</td>
+                                <td>{{ campaign.created_at.strftime('%m/%d/%Y') }}</td>
+                                <td>
+                                    <span class="badge {% if campaign.is_approved %}bg-success{% else %}bg-warning{% endif %}">
+                                        {% if campaign.is_approved %}Approved{% else %}Pending{% endif %}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        {% if not campaign.is_approved %}
+                                        <button class="btn btn-outline-success btn-sm" onclick="approveCampaign({{ campaign.id }})" title="Approve Campaign">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        {% endif %}
+                                        <button class="btn btn-outline-info btn-sm" onclick="viewCampaign({{ campaign.id }})" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="rejectCampaign({{ campaign.id }})" title="Reject Campaign">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Active Campaigns Summary -->
+                {% if active_campaigns %}
+                <div class="mt-5">
+                    <h5 class="fw-semibold mb-3">
+                        <i class="bi bi-graph-up me-2" style="color: var(--success-color);"></i>
+                        Active Campaigns ({{ active_campaigns|length }})
+                    </h5>
+                    <div class="row g-3">
+                        {% for campaign in active_campaigns[:6] %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card bg-dark border-secondary">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ campaign.name }}</h6>
+                                        <span class="badge bg-success">Active</span>
+                                    </div>
+                                    <p class="card-text small text-muted">{{ campaign.tool.name }}</p>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="small text-muted">Views</div>
+                                            <div class="fw-bold">{{ campaign.tool_views }}</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="small text-muted">Clicks</div>
+                                            <div class="fw-bold">{{ campaign.website_clicks }}</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="small text-muted">Spend</div>
+                                            <div class="fw-bold">${{ "%.0f"|format(campaign.total_spend) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-megaphone display-1" style="color: var(--success-color);"></i>
+                    <h5 class="mt-3">All campaigns reviewed!</h5>
+                    <p class="text-muted">No campaigns are pending approval at the moment.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Users Tab -->
+        <div class="tab-pane fade" id="users-tab">
+            <div class="professional-card">
+                <h4 class="fw-semibold mb-4">
+                    <i class="bi bi-people me-2" style="color: var(--primary-color);"></i>
+                    User Management
+                </h4>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background: var(--bg-primary);">
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Tools</th>
+                                <th>Reviews</th>
+                                <th>Joined</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <div class="fw-semibold">{{ user.username }}</div>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if user.is_advertiser %}bg-primary{% else %}bg-secondary{% endif %}">
+                                        {% if user.is_advertiser %}Advertiser{% else %}User{% endif %}
+                                    </span>
+                                </td>
+                                <td>{{ user.tools|length }}</td>
+                                <td>{{ user.reviews|length }}</td>
+                                <td>{{ user.created_at.strftime('%m/%d/%Y') }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-outline-info btn-sm" onclick="viewUser({{ user.id }})">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div class="tab-pane fade" id="settings-tab">
+            <div class="professional-card">
+                <h4 class="fw-semibold mb-4">
+                    <i class="bi bi-gear me-2" style="color: var(--primary-color);"></i>
+                    Platform Settings
+                </h4>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Bulk Operations</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-success" onclick="approveAll()">
+                                        <i class="bi bi-check-all me-2"></i>Approve All Pending
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="scrapeTools()">
+                                        <i class="bi bi-cloud-download me-2"></i>Scrape New Tools
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="exportData()">
+                                        <i class="bi bi-download me-2"></i>Export Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Platform Analytics</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="fw-bold text-primary">{{ tools|selectattr('is_approved')|list|length }}</div>
+                                        <small class="text-muted">Live Tools</small>
+                                    </div>                                    <div class="col-6">
+                                        <div class="fw-bold text-success">
+                                            {% set total_clicks = 0 %}
+                                            {% if tools %}
+                                                {% for tool in tools %}
+                                                    {% set total_clicks = total_clicks + tool.click_count %}
+                                                {% endfor %}
+                                            {% endif %}
+                                            {{ total_clicks }}
+                                        </div>
+                                        <small class="text-muted">Total Clicks</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tool Modal -->
+<div class="modal fade" id="addToolModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2" style="color: var(--primary-color);"></i>
+                    Add New AI Tool
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addToolForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tool Name *</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Website URL *</label>
+                            <input type="url" class="form-control" name="website_url" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Logo URL</label>
+                            <input type="url" class="form-control" name="logo_url">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Pricing Model *</label>                            <select class="form-select" name="pricing_model" required>
+                                <option value="">Choose...</option>
+                                <option value="Free">Free</option>
+                                <option value="Semi-Free">Freemium</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Categories</label>
+                            <div class="row g-2">
+                                {% set categories = [
+                                    'productivity', 'writing', 'design', 'coding', 'marketing', 
+                                    'video', 'audio', 'image-generation', 'data-analysis', 'automation'
+                                ] %}
+                                {% for category in categories %}
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="tags" value="{{ category }}" id="modal_{{ category }}">
+                                        <label class="form-check-label" for="modal_{{ category }}">
+                                            {{ category.replace('-', ' ').title() }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Add Tool
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Admin functions
+function approveTool(toolId) {
+    if (confirm('Approve this tool?')) {
+        fetch(`/admin/approve-tool/${toolId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error approving tool');
+                }
+            });
+    }
+}
+
+function deleteTool(toolId) {
+    if (confirm('Are you sure you want to delete this tool? This action cannot be undone.')) {
+        fetch(`/admin/delete-tool/${toolId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting tool');
+                }
+            });
+    }
+}
+
+function toggleFeatured(toolId) {
+    fetch(`/admin/toggle-featured/${toolId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error updating tool');
+            }
+        });
+}
+
+function approveAll() {
+    if (confirm('Approve all pending tools?')) {
+        fetch('/admin/approve-all', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error approving tools');
+                }
+            });
+    }
+}
+
+// Campaign management functions
+function approveCampaign(campaignId) {
+    if (confirm('Approve this promotion campaign?')) {
+        fetch(`/admin/approve-campaign/${campaignId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error approving campaign: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving campaign');
+            });
+    }
+}
+
+function rejectCampaign(campaignId) {
+    if (confirm('Reject this promotion campaign? This will permanently delete it.')) {
+        fetch(`/admin/reject-campaign/${campaignId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error rejecting campaign: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error rejecting campaign');
+            });
+    }
+}
+
+function approveAllCampaigns() {
+    if (confirm('Approve all pending campaigns?')) {
+        fetch('/admin/approve-all-campaigns', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Successfully approved ${data.count} campaigns!`);
+                    location.reload();
+                } else {
+                    alert('Error approving campaigns: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving campaigns');
+            });
+    }
+}
+
+function viewCampaign(campaignId) {
+    // For now, just show an alert - can be expanded to a modal later
+    alert('Campaign details view will be implemented in a future update!');
+}
+
+function scrapeTools() {
+    if (confirm('Start web scraping for new AI tools? This may take a few minutes.')) {
+        const btn = event.target;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Scraping...';
+        btn.disabled = true;
+        
+        fetch('/admin/scrape-tools', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(() => {
+                alert('Scraping completed');
+                location.reload();
+            });
+    }
+}
+
+// Add tool form
+document.getElementById('addToolForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const tags = Array.from(this.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+    formData.set('tags', JSON.stringify(tags));
+    
+    fetch('/admin/add-tool', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('addToolModal').querySelector('[data-bs-dismiss="modal"]').click();
+            location.reload();
+        } else {
+            alert('Error adding tool: ' + data.message);
+        }
+    });
+});
+
+// Search functionality
+document.getElementById('toolSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#toolsTable tbody tr');
+    
+    rows.forEach(row => {
+        const toolName = row.querySelector('td .fw-semibold').textContent.toLowerCase();
+        const url = row.querySelector('td .text-muted').textContent.toLowerCase();
+        
+        if (toolName.includes(searchTerm) || url.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Nav pills styling
+document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-pills .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+
+<style>
+.nav-pills .nav-link {
+    color: var(--text-secondary);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.btn-group .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %}

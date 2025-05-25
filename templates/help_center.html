@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center - Aeye{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card glass-card border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <span class="badge bg-primary p-2 px-3 mb-3">
+                            <i class="bi bi-question-circle me-2"></i>Help Center
+                        </span>
+                        <h1 class="gradient-text fw-bold">How can we help you?</h1>
+                        <p class="text-muted">Find answers to common questions about using Aeye</p>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-container mb-5">
+                        <form class="position-relative">
+                            <input type="text" class="form-control search-input" placeholder="Search for help articles...">
+                            <button type="submit" class="btn btn-primary search-btn">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- FAQ Categories -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <div class="help-category-card">
+                                <div class="icon-box">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                <h4>Account & Profile</h4>
+                                <ul class="list-unstyled">
+                                    <li><a href="#">Creating an account</a></li>
+                                    <li><a href="#">Managing your profile</a></li>
+                                    <li><a href="#">Changing your password</a></li>
+                                    <li><a href="#">Account verification</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="help-category-card">
+                                <div class="icon-box">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <h4>Finding AI Tools</h4>
+                                <ul class="list-unstyled">
+                                    <li><a href="#">Using search effectively</a></li>
+                                    <li><a href="#">Filtering tools by category</a></li>
+                                    <li><a href="#">Understanding tool ratings</a></li>
+                                    <li><a href="#">Comparing AI tools</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="help-category-card">
+                                <div class="icon-box">
+                                    <i class="bi bi-star"></i>
+                                </div>
+                                <h4>Reviews & Ratings</h4>
+                                <ul class="list-unstyled">
+                                    <li><a href="#">How to write a helpful review</a></li>
+                                    <li><a href="#">Review guidelines</a></li>
+                                    <li><a href="#">Editing your reviews</a></li>
+                                    <li><a href="#">Understanding the rating system</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="help-category-card">
+                                <div class="icon-box">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h4>Trust & Safety</h4>
+                                <ul class="list-unstyled">
+                                    <li><a href="#">Reporting inappropriate content</a></li>
+                                    <li><a href="#">Data privacy concerns</a></li>
+                                    <li><a href="#">Account security</a></li>
+                                    <li><a href="#">Spam prevention</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Still Need Help Section -->
+                    <div class="contact-cta p-4 text-center">
+                        <h4>Still need help?</h4>
+                        <p class="mb-4">Our support team is ready to assist you with any questions or issues you may have</p>
+                        <a href="{{ url_for('contact_us') }}" class="btn btn-primary px-4">
+                            <i class="bi bi-chat-dots me-2"></i>Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        position: relative;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+    
+    .search-input {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        border-radius: 15px;
+        padding: 15px 20px;
+        color: #fff;
+        font-size: 1rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding-right: 60px;
+    }
+    
+    .search-input:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.25);
+    }
+    
+    .search-btn {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        bottom: 5px;
+        border-radius: 12px;
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .help-category-card {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        height: 100%;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .help-category-card:hover {
+        border-color: rgba(96, 165, 250, 0.5);
+        transform: translateY(-5px);
+    }
+    
+    .help-category-card h4 {
+        font-size: 1.25rem;
+        margin: 1rem 0;
+        font-weight: 600;
+    }
+    
+    .help-category-card .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0066FF 0%, #60A5FA 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+    
+    .help-category-card ul li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .help-category-card ul li a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        display: block;
+        padding: 0.25rem 0;
+    }
+    
+    .help-category-card ul li a:hover {
+        color: var(--accent-blue);
+    }
+    
+    .contact-cta {
+        background: rgba(0, 102, 255, 0.1);
+        border: 1px solid rgba(0, 102, 255, 0.3);
+        border-radius: 16px;
+        margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .help-category-card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}

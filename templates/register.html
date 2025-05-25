@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}Join Aeye - Discover Amazing AI Tools{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Professional Register Design - Compact Version */
+.auth-wrapper {
+    min-height: 90vh;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+    padding: 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Removed ::before pseudo-element that was causing unwanted box effect */
+
+.auth-container {
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-card {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    border-radius: 24px;
+    padding: 2rem 2rem; /* Reduced padding */
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card:hover {
+    border-color: rgba(96, 165, 250, 0.5);    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.5rem; /* Reduced margin */
+}
+
+.auth-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.75rem; /* Smaller font size */
+    background: linear-gradient(135deg, #0066FF 0%, #60A5FA 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.25rem; /* Smaller margin */
+    letter-spacing: -0.025em;
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-family: var(--font-primary);
+    font-size: 0.9rem; /* Smaller font size */
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.3; /* Tighter line height */
+}
+
+.form-group {
+    margin-bottom: 1rem; /* Reduced spacing between form groups */
+    position: relative;
+}
+
+.form-label {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.8rem; /* Smaller font */
+    margin-bottom: 0.4rem; /* Reduced margin */
+    letter-spacing: 0.025em;
+    display: block;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.75rem 1rem; /* Reduced padding for shorter height */
+    padding-right: 2.5rem;
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-primary) !important;
+    font-size: 0.9rem; /* Slightly smaller font */transition: all 0.3s ease !important;
+    outline: none !important;
+}
+
+.auth-input:focus {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    transform: translateY(-1px);
+}
+
+.auth-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+}
+
+.form-check {
+    margin: 0.75rem 0; /* Reduced vertical spacing */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.form-check-input {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+    border-radius: 6px !important;
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: all 0.3s ease !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-blue) !important;
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+}
+
+.form-check-label {
+    color: var(--text-muted);
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 400;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 0.75rem 1.25rem !important; /* Smaller button height */
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;    font-family: var(--font-primary) !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important; /* Smaller font */
+    transition: all 0.3s ease !important;
+    position: relative;    overflow: hidden;
+    margin-bottom: 1rem; /* Reduced margin */
+}
+
+.auth-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.auth-submit-btn:hover::before {
+    left: 100%;
+}
+
+.auth-submit-btn:hover {
+    background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--secondary-blue) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.4) !important;
+    color: white !important;
+}
+
+.auth-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.auth-footer p {
+    margin: 0;
+    color: var(--text-muted);
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.auth-link {
+    color: var(--accent-blue) !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border-bottom: 1px solid transparent;
+}
+
+.auth-link:hover {
+    color: var(--primary-blue) !important;
+    border-bottom-color: var(--accent-blue);
+    text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+}
+
+/* Input Icons - Adjusted for smaller inputs */
+.input-icon {
+    position: absolute;
+    right: 1rem; /* Reduced right spacing */
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem; /* Smaller icon */
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus + .input-icon {
+    color: var(--accent-blue);
+}
+
+/* Welcome Badge - Compact */
+.welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22C55E;
+    padding: 0.35rem 0.8rem; /* Smaller padding */
+    border-radius: 20px;
+    font-size: 0.8rem; /* Smaller text */
+    font-weight: 500;
+    margin-bottom: 0.75rem; /* Reduced margin */
+}
+
+/* Form Grid for Name Fields */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .auth-title {
+        font-size: 2rem;
+    }
+    
+    .auth-input {
+        padding: 0.875rem 1rem;
+        padding-right: 2.75rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* Loading state */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                {% if request.args.get('type') == 'advertiser' %}
+                <div class="welcome-badge" style="background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #22C55E;">
+                    <i class="bi bi-briefcase"></i>
+                    Partner Registration
+                </div>
+                <h1 class="auth-title">Become a Partner</h1>
+                <p class="auth-subtitle">Join our partner program and promote your AI tools to thousands of users</p>
+                {% else %}
+                <div class="welcome-badge">
+                    <i class="bi bi-person-plus"></i>
+                    Join the Community
+                </div>                <h1 class="auth-title">Create your account</h1>
+                <p class="auth-subtitle">Join our AI tools discovery community</p>
+                {% endif %}
+            </div>
+
+            <form method="POST" novalidate>
+                {% if request.args.get('type') == 'advertiser' %}
+                <input type="hidden" name="is_advertiser" value="1">
+                {% endif %}
+                  <!-- Username input on its own line -->
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control auth-input" id="username" name="username" 
+                               placeholder="Enter your username" required>
+                        <i class="bi bi-person input-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Email input on its own line -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email address</label>
+                    <div class="position-relative">
+                        <input type="email" class="form-control auth-input" id="email" name="email" 
+                               placeholder="john.doe@example.com" required>
+                        <i class="bi bi-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="position-relative">
+                        <input type="password" class="form-control auth-input" id="password" name="password" 
+                               placeholder="Create a strong password" required>
+                        <i class="bi bi-lock input-icon"></i>
+                    </div>
+                </div>                <!-- Advertiser option temporarily hidden for launch -->
+                {% if false %}
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_advertiser" name="is_advertiser">
+                    <label class="form-check-label" for="is_advertiser">
+                        <strong>I want to promote my AI tools</strong> (Become a partner)
+                    </label>
+                </div>
+                {% endif %}
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                    <label class="form-check-label" for="terms">
+                        I agree to the <a href="#" class="auth-link">Terms of Service</a> and <a href="#" class="auth-link">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter">
+                    <label class="form-check-label" for="newsletter">
+                        {% if request.args.get('type') == 'advertiser' %}
+                        Send me partner updates and marketing opportunities (optional)
+                        {% else %}
+                        Send me updates about new AI tools and features (optional)
+                        {% endif %}
+                    </label>
+                </div>
+
+                <button type="submit" class="btn auth-submit-btn">
+                    {% if request.args.get('type') == 'advertiser' %}
+                    <i class="bi bi-briefcase me-2"></i>Join as Partner
+                    {% else %}
+                    <i class="bi bi-rocket-takeoff me-2"></i>Create Account
+                    {% endif %}
+                </button>
+
+                <div class="auth-footer">
+                    <p>
+                        Already have an account? 
+                        <a href="{{ url_for('login') }}" class="auth-link">
+                            Sign in instead
+                        </a>                    </p>
+                    <!-- Partner registration temporarily hidden for launch -->
+                    {% if false %}
+                    <p class="mt-2">
+                        Want to promote your AI tools? 
+                        <a href="{{ url_for('register') }}?type=advertiser" class="auth-link">
+                            Become a Partner
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
